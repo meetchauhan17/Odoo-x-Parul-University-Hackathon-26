@@ -3,15 +3,29 @@ import { Armchair, ShoppingBag, X } from 'lucide-react';
 import api from '../../api/client';
 import toast from 'react-hot-toast';
 
+function getTableDimensions(shape) {
+  switch (shape) {
+    case 'circle': return { w: 2, h: 2 };
+    case 'rectangle_h': return { w: 3, h: 2 };
+    case 'rectangle_v': return { w: 2, h: 3 };
+    case 'square':
+    default: return { w: 2, h: 2 };
+  }
+}
+
 export default function FloorPopup({ onSelect, onNoTable, onClose, session, isInline = false }) {
   const [floors, setFloors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFloorId, setSelectedFloorId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const floorsRes = await api.get('/floors');
         setFloors(floorsRes);
+        if (floorsRes.length > 0) {
+          setSelectedFloorId(floorsRes[0].id);
+        }
       } catch (e) {
         toast.error('Failed to load floor data');
       } finally {
@@ -31,9 +45,121 @@ export default function FloorPopup({ onSelect, onNoTable, onClose, session, isIn
     return order ? 'occupied' : 'available';
   };
 
-  /* Flat list metrics of all tables across floors */
+  /* Metrics across all floors */
   const totalTables = floors.reduce((n, f) => n + (f.tables?.filter(t => t.isActive).length || 0), 0);
   const occupied = floors.reduce((n, f) => n + (f.tables?.filter(t => t.isActive && getTableOrder(t))?.length || 0), 0);
+
+  const activeFloor = floors.find(f => f.id === selectedFloorId);
+  const activeFloorTables = activeFloor?.tables?.filter(t => t.isActive) || [];
+
+  const renderVisualFloorPlan = () => {
+    if (loading) {
+      return <div className="flex items-center justify-center h-64 text-slate-500 font-jakarta">Loading table layout…</div>;
+    }
+
+    if (floors.length === 0) {
+      return (
+        <div className="text-center py-12 text-slate-500 font-jakarta bg-white border-2 border-slate-200 rounded-2xl">
+          <div className="flex justify-center mb-3">
+            <Armchair size={48} className="text-slate-300" />
+          </div>
+          <p className="font-bold text-slate-700">No floors configured yet.</p>
+          <p className="text-xs mt-1">Go to Backend → Floor & Tables to design layouts.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {/* Floor Tab Selector */}
+        <div className="flex gap-2 border-b-2 border-slate-100 pb-2 overflow-x-auto">
+          {floors.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setSelectedFloorId(f.id)}
+              className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold border-2 transition shrink-0 font-outfit ${
+                selectedFloorId === f.id
+                  ? 'bg-[#8B5CF6] text-white border-slate-800 shadow-pop-xs hover:translate-y-[-1px]'
+                  : 'bg-white text-slate-600 border-slate-100 hover:border-slate-200'
+              }`}
+            >
+              {f.name} ({f.tables?.filter(t => t.isActive).length})
+            </button>
+          ))}
+        </div>
+
+        {/* Visual Map Grid (24x16 ratio container) */}
+        <div className="relative w-full border-2 border-slate-800 rounded-2xl bg-[#FFFDF5] bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] [background-size:16px_16px] shadow-pop-xs overflow-hidden select-none"
+             style={{ aspectRatio: '24 / 16' }}>
+          {activeFloorTables.map(table => {
+            const status = getTableStatus(table);
+            const order = getTableOrder(table);
+            const { w, h } = getTableDimensions(table.shape);
+
+            let bgClass = 'bg-white border-slate-200 hover:border-slate-800';
+            if (status === 'available') {
+              bgClass = 'bg-[#E6FDF4] border-slate-800 hover:bg-[#D1FAE5] hover:shadow-pop';
+            } else if (status === 'occupied') {
+              bgClass = 'bg-[#FDF4FF] border-violet-600 hover:bg-[#F3E8FF] hover:border-violet-800 hover:shadow-pop';
+            }
+
+            const shapeClass = table.shape === 'circle' ? 'rounded-full' : 'rounded-xl';
+
+            return (
+              <button
+                key={table.id}
+                onClick={() => status !== 'inactive' && onSelect(table, order)}
+                disabled={status === 'inactive'}
+                style={{
+                  left: `${(table.x / 24) * 100}%`,
+                  top: `${(table.y / 16) * 100}%`,
+                  width: `${(w / 24) * 100}%`,
+                  height: `${(h / 16) * 100}%`,
+                  position: 'absolute',
+                }}
+                className={`
+                  flex flex-col items-center justify-center border-2 transition select-none group font-jakarta p-1 shadow-pop-xs
+                  ${bgClass} ${shapeClass}
+                `}
+              >
+                <div className="flex items-center gap-1">
+                  <span className="font-bold text-slate-800 text-[9px] sm:text-xs md:text-sm lg:text-base font-outfit uppercase">
+                    {table.tableNumber}
+                  </span>
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                    status === 'available' ? 'bg-emerald-500' :
+                    status === 'occupied' ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'
+                  }`} />
+                </div>
+                <div className="text-[7px] sm:text-[9px] md:text-[10px] text-slate-500 font-semibold leading-none mt-0.5">
+                  {table.seats} seats
+                </div>
+                
+                {status === 'occupied' && order && (
+                  <div className={`mt-1 text-[7px] sm:text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded border leading-none scale-90 sm:scale-100 ${
+                    order.status === 'READY'
+                      ? 'text-violet-800 bg-violet-200/80 border-violet-400'
+                      : order.status === 'SENT_TO_KITCHEN'
+                      ? 'text-blue-700 bg-blue-100/60 border-blue-200'
+                      : 'text-violet-750 bg-violet-100/60 border-violet-200'
+                  }`}>
+                    ₹{parseFloat(order.total).toFixed(0)} •{' '}
+                    {order.status === 'READY' ? 'Ready' : order.status === 'SENT_TO_KITCHEN' ? 'Kitchen' : 'Draft'}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+
+          {activeFloorTables.length === 0 && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-white/40 pointer-events-none">
+              <span className="font-bold text-slate-400 text-xs md:text-sm font-jakarta">No tables on this floor plan</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   if (isInline) {
     return (
@@ -49,97 +175,8 @@ export default function FloorPopup({ onSelect, onNoTable, onClose, session, isIn
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6 bg-[#FFFDF5]">
-          {loading && (
-            <div className="flex items-center justify-center h-40 text-slate-500 font-jakarta">Loading tables…</div>
-          )}
-
-          {!loading && floors.length === 0 && (
-            <div className="text-center py-12 text-slate-500 font-jakarta">
-              <div className="flex justify-center mb-3">
-                <Armchair size={48} className="text-slate-300" />
-              </div>
-              <p className="font-bold text-slate-700">No floors configured yet.</p>
-              <p className="text-xs mt-1">Go to Backend → Floor & Tables to add them.</p>
-            </div>
-          )}
-
-          {floors.map(floor => (
-            <div key={floor.id} className="mb-6">
-              {/* Floor header */}
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-violet-600 font-bold text-sm font-outfit">{floor.name}</span>
-                <span className="flex-1 h-px bg-slate-200" />
-                <span className="text-xs font-semibold text-slate-400 font-jakarta">{floor.tables?.filter(t => t.isActive).length} tables</span>
-              </div>
-
-              {/* Tables grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {floor.tables?.filter(t => t.isActive).map(table => {
-                  const status = getTableStatus(table);
-                  const order = getTableOrder(table);
-
-                  return (
-                    <button
-                      key={table.id}
-                      onClick={() => status !== 'inactive' && onSelect(table, order)}
-                      disabled={status === 'inactive'}
-                      className={`
-                        relative p-4 rounded-xl border-2 transition text-left group font-jakarta
-                        ${status === 'available'
-                          ? 'bg-white border-slate-200 hover:border-slate-800'
-                          : status === 'occupied'
-                          ? 'bg-[#FDF4FF] border-violet-500 hover:border-violet-700'
-                          : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'}
-                      `}
-                      style={{
-                        boxShadow: status !== 'inactive' ? 'var(--pop-shadow-sm)' : 'none',
-                      }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-slate-800 text-lg font-outfit">
-                          {table.tableNumber.toUpperCase()}
-                        </span>
-                        <span className={`w-2.5 h-2.5 rounded-full ${
-                          status === 'available' ? 'bg-emerald-500' :
-                          status === 'occupied' ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'
-                        }`} />
-                      </div>
-                      <div className="text-xs text-slate-500 font-medium">{table.seats} seats</div>
-                      {status === 'occupied' && order && (
-                        <div className={`mt-2 text-xs font-bold px-2 py-0.5 rounded border inline-block ${
-                          order.status === 'READY'
-                            ? 'text-violet-800 bg-violet-200/80 border-violet-450'
-                            : order.status === 'SENT_TO_KITCHEN'
-                            ? 'text-blue-700 bg-blue-100/60 border-blue-200'
-                            : 'text-violet-700 bg-violet-100/60 border-violet-200'
-                        }`}>
-                          ₹{parseFloat(order.total).toFixed(0)} •{' '}
-                          {order.status === 'READY' ? '✓ Ready' : order.status === 'SENT_TO_KITCHEN' ? 'Kitchen' : 'Draft'}
-                        </div>
-                      )}
-
-                      {/* Hover overlay for occupied */}
-                      {status === 'occupied' && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-violet-600/0 group-hover:bg-violet-600/5 transition">
-                          <span className="text-xs text-violet-700 opacity-0 group-hover:opacity-100 font-bold transition">
-                            Open Order →
-                          </span>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-
-                {/* Empty state for floor */}
-                {(!floor.tables || floor.tables.filter(t => t.isActive).length === 0) && (
-                  <div className="col-span-4 py-4 text-center text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-xl font-jakarta">
-                    No tables on this floor
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="flex-1 overflow-y-auto px-6 py-5 bg-[#FFFDF5]">
+          {renderVisualFloorPlan()}
         </div>
 
         {/* Footer — No Table / Takeaway */}
@@ -182,97 +219,8 @@ export default function FloorPopup({ onSelect, onNoTable, onClose, session, isIn
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-[#FFFDF5]">
-          {loading && (
-            <div className="flex items-center justify-center h-40 text-slate-500 font-jakarta">Loading tables…</div>
-          )}
-
-          {!loading && floors.length === 0 && (
-            <div className="text-center py-12 text-slate-500 font-jakarta">
-              <div className="flex justify-center mb-3">
-                <Armchair size={48} className="text-slate-300" />
-              </div>
-              <p className="font-bold text-slate-700">No floors configured yet.</p>
-              <p className="text-xs mt-1">Go to Backend → Floor & Tables to add them.</p>
-            </div>
-          )}
-
-          {floors.map(floor => (
-            <div key={floor.id} className="mb-6">
-              {/* Floor header */}
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-violet-600 font-bold text-sm font-outfit">{floor.name}</span>
-                <span className="flex-1 h-px bg-slate-200" />
-                <span className="text-xs font-semibold text-slate-400 font-jakarta">{floor.tables?.filter(t => t.isActive).length} tables</span>
-              </div>
-
-              {/* Tables grid */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                {floor.tables?.filter(t => t.isActive).map(table => {
-                  const status = getTableStatus(table);
-                  const order = getTableOrder(table);
-
-                  return (
-                    <button
-                      key={table.id}
-                      onClick={() => status !== 'inactive' && onSelect(table, order)}
-                      disabled={status === 'inactive'}
-                      className={`
-                        relative p-4 rounded-xl border-2 transition text-left group font-jakarta
-                        ${status === 'available'
-                          ? 'bg-white border-slate-200 hover:border-slate-800'
-                          : status === 'occupied'
-                          ? 'bg-[#FDF4FF] border-violet-500 hover:border-violet-700'
-                          : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'}
-                      `}
-                      style={{
-                        boxShadow: status !== 'inactive' ? 'var(--pop-shadow-sm)' : 'none',
-                      }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-slate-800 text-lg font-outfit">
-                          {table.tableNumber.toUpperCase()}
-                        </span>
-                        <span className={`w-2.5 h-2.5 rounded-full ${
-                          status === 'available' ? 'bg-emerald-500' :
-                          status === 'occupied' ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'
-                        }`} />
-                      </div>
-                      <div className="text-xs text-slate-500 font-medium">{table.seats} seats</div>
-                      {status === 'occupied' && order && (
-                        <div className={`mt-2 text-xs font-bold px-2 py-0.5 rounded border inline-block ${
-                          order.status === 'READY'
-                            ? 'text-violet-800 bg-violet-200/80 border-violet-400'
-                            : order.status === 'SENT_TO_KITCHEN'
-                            ? 'text-blue-700 bg-blue-100/60 border-blue-200'
-                            : 'text-violet-700 bg-violet-100/60 border-violet-200'
-                        }`}>
-                          ₹{parseFloat(order.total).toFixed(0)} •{' '}
-                          {order.status === 'READY' ? '✓ Ready' : order.status === 'SENT_TO_KITCHEN' ? 'Kitchen' : 'Draft'}
-                        </div>
-                      )}
-
-                      {/* Hover overlay for occupied */}
-                      {status === 'occupied' && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-violet-600/0 group-hover:bg-violet-600/5 transition">
-                          <span className="text-xs text-violet-700 opacity-0 group-hover:opacity-100 font-bold transition">
-                            Open Order →
-                          </span>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-
-                {/* Empty state for floor */}
-                {(!floor.tables || floor.tables.filter(t => t.isActive).length === 0) && (
-                  <div className="col-span-4 py-4 text-center text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-xl font-jakarta">
-                    No tables on this floor
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="flex-1 overflow-y-auto px-6 py-4 bg-[#FFFDF5]">
+          {renderVisualFloorPlan()}
         </div>
 
         {/* Footer — No Table / Takeaway */}
@@ -283,7 +231,7 @@ export default function FloorPopup({ onSelect, onNoTable, onClose, session, isIn
             </div>
             <button
               onClick={onNoTable}
-              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 border-2 border-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition"
+              className="flex items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c4ee4] border-2 border-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition"
               style={{ boxShadow: 'var(--pop-shadow-sm)' }}
             >
               <ShoppingBag size={14} className="text-white" />

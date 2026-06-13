@@ -15,20 +15,29 @@ router.get('/', verifyToken, async (req, res) => {
 
 router.post('/', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { tableNumber, seats, floorId } = req.body;
+    const { tableNumber, seats, floorId, x, y, shape } = req.body;
     if (!tableNumber) return res.status(400).json({ error: 'Table number required' });
     const parsedSeats = parseInt(seats, 10);
     if (isNaN(parsedSeats) || parsedSeats <= 0) return res.status(400).json({ error: 'Seats must be a positive number' });
     const exists = await prisma.table.findFirst({ where: { tableNumber: tableNumber.trim().toUpperCase(), floorId, isActive: true } });
     if (exists) return res.status(400).json({ error: 'Table number already exists on this floor' });
-    const table = await prisma.table.create({ data: { tableNumber: tableNumber.trim().toUpperCase(), seats: parsedSeats, floorId } });
+    const table = await prisma.table.create({
+      data: {
+        tableNumber: tableNumber.trim().toUpperCase(),
+        seats: parsedSeats,
+        floorId,
+        x: x !== undefined ? parseInt(x, 10) : 0,
+        y: y !== undefined ? parseInt(y, 10) : 0,
+        shape: shape || 'square'
+      }
+    });
     res.status(201).json(table);
   } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
 });
 
 router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { tableNumber, seats, isActive } = req.body;
+    const { tableNumber, seats, isActive, x, y, shape } = req.body;
     let parsedSeats = undefined;
     if (seats !== undefined) {
       parsedSeats = parseInt(seats, 10);
@@ -43,7 +52,14 @@ router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
     }
     const table = await prisma.table.update({
       where: { id: req.params.id },
-      data: { tableNumber: tableNumber ? tableNumber.trim().toUpperCase() : undefined, seats: parsedSeats, isActive }
+      data: {
+        tableNumber: tableNumber ? tableNumber.trim().toUpperCase() : undefined,
+        seats: parsedSeats,
+        isActive,
+        x: x !== undefined ? parseInt(x, 10) : undefined,
+        y: y !== undefined ? parseInt(y, 10) : undefined,
+        shape: shape !== undefined ? shape : undefined
+      }
     });
     res.json(table);
   } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }

@@ -110,6 +110,9 @@ model Table {
   floorId        String
   isActive       Boolean  @default(true)
   currentOrderId String?
+  x              Int      @default(0)
+  y              Int      @default(0)
+  shape          String   @default("square")
   floor          Floor    @relation(fields: [floorId], references: [id])
   orders         Order[]
 }
