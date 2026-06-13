@@ -112,7 +112,7 @@ export default function Tables() {
       toast.success('Table added');
       load();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to add table');
+      toast.error(error.error || 'Failed to add table');
     }
   };
 

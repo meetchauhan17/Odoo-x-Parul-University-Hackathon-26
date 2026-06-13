@@ -32,7 +32,10 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
       }
     });
     res.status(201).json(table);
-  } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
+  } catch (e) {
+    console.error("Error in POST /tables:", e);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
 });
 
 router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
@@ -62,7 +65,10 @@ router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
       }
     });
     res.json(table);
-  } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
+  } catch (e) {
+    console.error("Error in PUT /tables:", e);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
 });
 
 router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
