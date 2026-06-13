@@ -713,6 +713,33 @@ export default function OrderView({ table, session, existingOrder, initialOrder,
   return (
     <div className="pos-layout flex flex-col lg:flex-row h-full overflow-hidden" style={{ background: BG, fontFamily: FONT_B }}>
 
+      {/* Mobile segmented toggle */}
+      <div className="lg:hidden shrink-0 px-4 py-2 bg-white border-b-2 border-slate-800" style={{ background: WHITE }}>
+        <div className="flex bg-slate-150 p-0.5 rounded-xl border-2 border-slate-800" style={{ boxShadow: 'var(--pop-shadow-sm)' }}>
+          <button
+            type="button"
+            onClick={() => setMobileTab('products')}
+            className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all ${mobileTab === 'products' ? 'bg-white text-slate-800 border-2 border-slate-800 shadow-sm' : 'text-slate-500'}`}
+            style={{ fontFamily: FONT_H }}
+          >
+            Catalog
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('cart')}
+            className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 ${mobileTab === 'cart' ? 'bg-white text-slate-800 border-2 border-slate-800 shadow-sm' : 'text-slate-500'}`}
+            style={{ fontFamily: FONT_H }}
+          >
+            <span>Cart</span>
+            {cartItems.length > 0 && (
+              <span className="bg-[#F472B6] text-slate-900 text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-slate-800" style={{ boxShadow: '1px 1px 0px 0px #1E293B' }}>
+                {cartItems.length}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
       {/* ══ LEFT — Product Grid ══════════════════════════ */}
       <div className={`pos-product-col flex-col shrink-0 border-r ${mobileTab === 'products' ? 'flex' : 'hidden'} lg:flex lg:w-[58%] w-full h-full`}
            style={{ borderColor: BORDER, background: BG }}>
@@ -738,31 +765,6 @@ export default function OrderView({ table, session, existingOrder, initialOrder,
                 <X size={14} />
               </button>
             )}
-          </div>
-
-          {/* Mobile segmented toggle */}
-          <div className="lg:hidden flex bg-slate-150 p-0.5 rounded-xl border-2 border-slate-800" style={{ boxShadow: 'var(--pop-shadow-sm)' }}>
-            <button
-              type="button"
-              onClick={() => setMobileTab('products')}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all ${mobileTab === 'products' ? 'bg-white text-slate-800 border-2 border-slate-800 shadow-sm' : 'text-slate-500'}`}
-              style={{ fontFamily: FONT_H }}
-            >
-              Catalog
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileTab('cart')}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 ${mobileTab === 'cart' ? 'bg-white text-slate-800 border-2 border-slate-800 shadow-sm' : 'text-slate-500'}`}
-              style={{ fontFamily: FONT_H }}
-            >
-              <span>Cart</span>
-              {cartItems.length > 0 && (
-                <span className="bg-[#F472B6] text-slate-900 text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-slate-800" style={{ boxShadow: '1px 1px 0px 0px #1E293B' }}>
-                  {cartItems.length}
-                </span>
-              )}
-            </button>
           </div>
 
           {/* Category tabs */}
