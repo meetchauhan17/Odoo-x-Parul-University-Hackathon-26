@@ -78,52 +78,54 @@ export default function Categories() {
       </div>
 
       <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
-              {['Color', 'Name', 'Products Count', 'Actions'].map(h => (
-                <th key={h} className="px-6 py-3.5 text-left font-bold text-slate-600">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {categories.map(c => {
-              const count = products.filter(p => p.categoryId === c.id).length;
-              return (
-                <tr key={c.id} className="hover:bg-slate-50/50 transition">
-                  <td className="px-6 py-4">
-                    <div className="w-8 h-8 rounded-xl border-2 border-slate-800 shadow-pop-sm" style={{ backgroundColor: c.color }} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold text-slate-800"
-                      style={{ backgroundColor: c.color + '15', border: `1px solid ${c.color}44` }}>
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.color }} />
-                      {c.name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600 font-semibold">{count} product{count !== 1 ? 's' : ''}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => openEdit(c)}
-                        className="flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-1 rounded-lg transition"
-                      >
-                        <Edit3 size={12} /> Edit
-                      </button>
-                      <button
-                        onClick={() => { setSelected(c); setModal('delete'); }}
-                        className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
-                      >
-                        <Trash2 size={12} /> Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {categories.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No categories yet.</div>}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[550px] border-collapse">
+            <thead>
+              <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
+                {['Color', 'Name', 'Products Count', 'Actions'].map(h => (
+                  <th key={h} className="px-6 py-3.5 text-left font-bold text-slate-600">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {categories.map(c => {
+                const count = products.filter(p => p.categoryId === c.id).length;
+                return (
+                  <tr key={c.id} className="hover:bg-slate-50/50 transition">
+                    <td className="px-6 py-4">
+                      <div className="w-8 h-8 rounded-xl border-2 border-slate-800 shadow-pop-sm" style={{ backgroundColor: c.color }} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold text-slate-800"
+                        style={{ backgroundColor: c.color + '15', border: `1px solid ${c.color}44` }}>
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.color }} />
+                        {c.name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600 font-semibold">{count} product{count !== 1 ? 's' : ''}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEdit(c)}
+                          className="flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-1 rounded-lg transition"
+                        >
+                          <Edit3 size={12} /> Edit
+                        </button>
+                        <button
+                          onClick={() => { setSelected(c); setModal('delete'); }}
+                          className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {categories.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No categories yet.</div>}
+        </div>
       </div>
 
       {(modal === 'add' || modal === 'edit') && (

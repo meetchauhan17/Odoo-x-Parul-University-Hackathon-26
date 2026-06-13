@@ -77,54 +77,56 @@ export default function Products() {
       </div>
 
       <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
-              {['Name', 'Category', 'Price', 'Tax', 'Unit', 'KDS', 'Actions'].map(h => (
-                <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {products.map(p => (
-              <tr key={p.id} className="hover:bg-slate-50/50 transition">
-                <td className="px-5 py-4 text-slate-800 font-bold">{p.name}</td>
-                <td className="px-5 py-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{ backgroundColor: (p.category?.color || '#6B7280') + '15', color: p.category?.color || '#6B7280', border: `1px solid ${(p.category?.color || '#6B7280')}33` }}>
-                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.category?.color || '#6B7280' }} />
-                    {p.category?.name}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-slate-800 font-bold">₹{parseFloat(p.price).toFixed(2)}</td>
-                <td className="px-5 py-4 text-slate-600 font-semibold">{p.tax}%</td>
-                <td className="px-5 py-4 text-slate-600 font-semibold">{p.unitOfMeasure}</td>
-                <td className="px-5 py-4">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${p.showOnKds ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30' : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
-                    {p.showOnKds ? 'Yes' : 'No'}
-                  </span>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openEdit(p)}
-                      className="flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-1 rounded-lg transition"
-                    >
-                      <Edit3 size={12} /> Edit
-                    </button>
-                    <button
-                      onClick={() => { setSelected(p); setModal('delete'); }}
-                      className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
-                    >
-                      <Trash2 size={12} /> Delete
-                    </button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] border-collapse">
+            <thead>
+              <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
+                {['Name', 'Category', 'Price', 'Tax', 'Unit', 'KDS', 'Actions'].map(h => (
+                  <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {products.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No products yet. Add one!</div>}
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {products.map(p => (
+                <tr key={p.id} className="hover:bg-slate-50/50 transition">
+                  <td className="px-5 py-4 text-slate-800 font-bold">{p.name}</td>
+                  <td className="px-5 py-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                      style={{ backgroundColor: (p.category?.color || '#6B7280') + '15', color: p.category?.color || '#6B7280', border: `1px solid ${(p.category?.color || '#6B7280')}33` }}>
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.category?.color || '#6B7280' }} />
+                      {p.category?.name}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-slate-800 font-bold">₹{parseFloat(p.price).toFixed(2)}</td>
+                  <td className="px-5 py-4 text-slate-600 font-semibold">{p.tax}%</td>
+                  <td className="px-5 py-4 text-slate-600 font-semibold">{p.unitOfMeasure}</td>
+                  <td className="px-5 py-4">
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${p.showOnKds ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30' : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
+                      {p.showOnKds ? 'Yes' : 'No'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openEdit(p)}
+                        className="flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-1 rounded-lg transition"
+                      >
+                        <Edit3 size={12} /> Edit
+                      </button>
+                      <button
+                        onClick={() => { setSelected(p); setModal('delete'); }}
+                        className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
+                      >
+                        <Trash2 size={12} /> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {products.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No products yet. Add one!</div>}
+        </div>
       </div>
 
       {(modal === 'add' || modal === 'edit') && (

@@ -86,69 +86,71 @@ export default function UsersPage() {
       </div>
 
       <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
-              {['Name', 'Email', 'Role', 'Status', 'Created', 'Actions'].map(h => (
-                <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {users.map(u => (
-              <tr key={u.id} className={`transition ${!u.isActive ? 'opacity-55 bg-slate-50/30' : 'hover:bg-slate-50/50'}`}>
-                <td className="px-5 py-4 text-slate-800 font-bold flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl border-2 border-slate-800 bg-[#FBBF24] text-slate-900 flex items-center justify-center text-sm font-black shadow-pop-sm shrink-0">
-                    {u.name?.[0]?.toUpperCase()}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span>{u.name}</span>
-                    {u.id === me?.id && <span className="text-xs bg-slate-100 border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded-md font-bold">(you)</span>}
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-slate-600 font-semibold text-sm">{u.email}</td>
-                <td className="px-5 py-4">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${u.role === 'ADMIN' ? 'bg-orange-500/10 border-orange-500/20 text-orange-600' : 'bg-blue-500/10 border-blue-500/20 text-blue-600'}`}>
-                    {u.role}
-                  </span>
-                </td>
-                <td className="px-5 py-4">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${u.isActive ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-slate-100 border-slate-200 text-slate-400'}`}>
-                    {u.isActive ? 'Active' : 'Archived'}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-slate-500 font-semibold text-sm">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                <td className="px-5 py-4">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => { setSelected(u); setNewPassword(''); setModal('password'); }}
-                      className="flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-1 rounded-lg transition"
-                    >
-                      <Key size={12} /> Password
-                    </button>
-                    {u.id !== me?.id && u.isActive && (
-                      <button
-                        onClick={() => archiveUser(u.id)}
-                        className="flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-lg transition"
-                      >
-                        <Archive size={12} /> Archive
-                      </button>
-                    )}
-                    {u.id !== me?.id && (
-                      <button
-                        onClick={() => deleteUser(u.id)}
-                        className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
-                      >
-                        <Trash2 size={12} /> Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[650px] border-collapse">
+            <thead>
+              <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
+                {['Name', 'Email', 'Role', 'Status', 'Created', 'Actions'].map(h => (
+                  <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {users.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No users found.</div>}
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {users.map(u => (
+                <tr key={u.id} className={`transition ${!u.isActive ? 'opacity-55 bg-slate-50/30' : 'hover:bg-slate-50/50'}`}>
+                  <td className="px-5 py-4 text-slate-800 font-bold flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl border-2 border-slate-800 bg-[#FBBF24] text-slate-900 flex items-center justify-center text-sm font-black shadow-pop-sm shrink-0">
+                      {u.name?.[0]?.toUpperCase()}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>{u.name}</span>
+                      {u.id === me?.id && <span className="text-xs bg-slate-100 border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded-md font-bold">(you)</span>}
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-slate-600 font-semibold text-sm">{u.email}</td>
+                  <td className="px-5 py-4">
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${u.role === 'ADMIN' ? 'bg-orange-500/10 border-orange-500/20 text-orange-600' : 'bg-blue-500/10 border-blue-500/20 text-blue-600'}`}>
+                      {u.role}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${u.isActive ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-slate-100 border-slate-200 text-slate-400'}`}>
+                      {u.isActive ? 'Active' : 'Archived'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-slate-500 font-semibold text-sm">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
+                  <td className="px-5 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => { setSelected(u); setNewPassword(''); setModal('password'); }}
+                        className="flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-1 rounded-lg transition"
+                      >
+                        <Key size={12} /> Password
+                      </button>
+                      {u.id !== me?.id && u.isActive && (
+                        <button
+                          onClick={() => archiveUser(u.id)}
+                          className="flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-lg transition"
+                        >
+                          <Archive size={12} /> Archive
+                        </button>
+                      )}
+                      {u.id !== me?.id && (
+                        <button
+                          onClick={() => deleteUser(u.id)}
+                          className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {users.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No users found.</div>}
+        </div>
       </div>
 
       {modal === 'add' && (

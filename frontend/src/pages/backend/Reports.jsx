@@ -420,25 +420,27 @@ export default function Reports() {
                 <Trophy size={16} className="text-amber-500" />
                 <h3 className="text-slate-800 font-bold font-outfit text-sm">Top Products</h3>
               </div>
-              <table className="w-full">
-                <thead><tr className="text-xs text-slate-500 uppercase border-b-2 border-slate-100 font-bold">
-                  <th className="px-4 py-2.5 text-left font-bold">#</th>
-                  <th className="px-4 py-2.5 text-left font-bold">Product</th>
-                  <th className="px-4 py-2.5 text-right font-bold">Qty</th>
-                  <th className="px-4 py-2.5 text-right font-bold">Revenue</th>
-                </tr></thead>
-                <tbody className="divide-y divide-slate-100">
-                  {(data.topProducts||[]).map((p,i) => (
-                    <tr key={i} className="hover:bg-slate-50/50 transition">
-                      <td className="px-4 py-2.5 text-slate-400 font-mono font-bold">{i+1}</td>
-                      <td className="px-4 py-2.5 text-slate-800 font-bold">{p.name}</td>
-                      <td className="px-4 py-2.5 text-right text-slate-500 font-semibold">{p.qty}</td>
-                      <td className="px-4 py-2.5 text-right text-[#8B5CF6] font-black">{fmt(p.revenue)}</td>
-                    </tr>
-                  ))}
-                  {!data.topProducts?.length && <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-400 text-xs font-semibold">No data</td></tr>}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[320px]">
+                  <thead><tr className="text-xs text-slate-500 uppercase border-b-2 border-slate-100 font-bold">
+                    <th className="px-4 py-2.5 text-left font-bold">#</th>
+                    <th className="px-4 py-2.5 text-left font-bold">Product</th>
+                    <th className="px-4 py-2.5 text-right font-bold">Qty</th>
+                    <th className="px-4 py-2.5 text-right font-bold">Revenue</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(data.topProducts||[]).map((p,i) => (
+                      <tr key={i} className="hover:bg-slate-50/50 transition">
+                        <td className="px-4 py-2.5 text-slate-400 font-mono font-bold">{i+1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 font-bold">{p.name}</td>
+                        <td className="px-4 py-2.5 text-right text-slate-500 font-semibold">{p.qty}</td>
+                        <td className="px-4 py-2.5 text-right text-[#8B5CF6] font-black">{fmt(p.revenue)}</td>
+                      </tr>
+                    ))}
+                    {!data.topProducts?.length && <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-400 text-xs font-semibold">No data</td></tr>}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop-sm">
@@ -446,25 +448,27 @@ export default function Reports() {
                 <CreditCard size={16} className="text-violet-500" />
                 <h3 className="text-slate-800 font-bold font-outfit text-sm">Highest Orders</h3>
               </div>
-              <table className="w-full">
-                <thead><tr className="text-xs text-slate-500 uppercase border-b-2 border-slate-100 font-bold">
-                  <th className="px-4 py-2.5 text-left font-bold">Order #</th>
-                  <th className="px-4 py-2.5 text-right font-bold">Amount</th>
-                  <th className="px-4 py-2.5 text-right font-bold">Time</th>
-                </tr></thead>
-                <tbody className="divide-y divide-slate-100">
-                  {(data.topOrders||[]).map((o,i) => (
-                    <tr key={o.id} className="hover:bg-slate-50/50 transition">
-                      <td className="px-4 py-2.5 text-blue-500 font-mono font-bold text-xs">{o.orderNumber}</td>
-                      <td className="px-4 py-2.5 text-right text-slate-800 font-black">{fmt(o.total)}</td>
-                      <td className="px-4 py-2.5 text-right text-slate-400 font-semibold text-xs">
-                        {new Date(o.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
-                      </td>
-                    </tr>
-                  ))}
-                  {!data.topOrders?.length && <tr><td colSpan={3} className="px-4 py-6 text-center text-slate-400 text-xs font-semibold">No data</td></tr>}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[300px]">
+                  <thead><tr className="text-xs text-slate-500 uppercase border-b-2 border-slate-100 font-bold">
+                    <th className="px-4 py-2.5 text-left font-bold">Order #</th>
+                    <th className="px-4 py-2.5 text-right font-bold">Amount</th>
+                    <th className="px-4 py-2.5 text-right font-bold">Time</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(data.topOrders||[]).map((o,i) => (
+                      <tr key={o.id} className="hover:bg-slate-50/50 transition">
+                        <td className="px-4 py-2.5 text-blue-500 font-mono font-bold text-xs">{o.orderNumber}</td>
+                        <td className="px-4 py-2.5 text-right text-slate-800 font-black">{fmt(o.total)}</td>
+                        <td className="px-4 py-2.5 text-right text-slate-400 font-semibold text-xs">
+                          {new Date(o.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
+                        </td>
+                      </tr>
+                    ))}
+                    {!data.topOrders?.length && <tr><td colSpan={3} className="px-4 py-6 text-center text-slate-400 text-xs font-semibold">No data</td></tr>}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop-sm">
@@ -472,27 +476,29 @@ export default function Reports() {
                 <Tag size={16} className="text-pink-500" />
                 <h3 className="text-slate-800 font-bold font-outfit text-sm">Sales by Category</h3>
               </div>
-              <table className="w-full">
-                <thead><tr className="text-xs text-slate-500 uppercase border-b-2 border-slate-100 font-bold">
-                  <th className="px-4 py-2.5 text-left font-bold">Category</th>
-                  <th className="px-4 py-2.5 text-right font-bold">Revenue</th>
-                </tr></thead>
-                <tbody className="divide-y divide-slate-100">
-                  {(data.topCategories||[]).map((c,i) => (
-                    <tr key={i} className="hover:bg-slate-50/50 transition">
-                      <td className="px-4 py-2.5">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                          style={{ backgroundColor:(c.color||'#6B7280')+'15', color:(c.color||'#6b7280'), border:`1px solid ${c.color||'#6b7280'}33` }}>
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c.color||'#6B7280' }} />
-                          {c.name}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-emerald-600 font-bold">{fmt(c.revenue)}</td>
-                    </tr>
-                  ))}
-                  {!data.topCategories?.length && <tr><td colSpan={2} className="px-4 py-6 text-center text-slate-400 text-xs font-semibold">No data</td></tr>}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[280px]">
+                  <thead><tr className="text-xs text-slate-500 uppercase border-b-2 border-slate-100 font-bold">
+                    <th className="px-4 py-2.5 text-left font-bold">Category</th>
+                    <th className="px-4 py-2.5 text-right font-bold">Revenue</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(data.topCategories||[]).map((c,i) => (
+                      <tr key={i} className="hover:bg-slate-50/50 transition">
+                        <td className="px-4 py-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                            style={{ backgroundColor:(c.color||'#6B7280')+'15', color:(c.color||'#6b7280'), border:`1px solid ${c.color||'#6b7280'}33` }}>
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c.color||'#6B7280' }} />
+                            {c.name}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-right text-emerald-600 font-bold">{fmt(c.revenue)}</td>
+                      </tr>
+                    ))}
+                    {!data.topCategories?.length && <tr><td colSpan={2} className="px-4 py-6 text-center text-slate-400 text-xs font-semibold">No data</td></tr>}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </>

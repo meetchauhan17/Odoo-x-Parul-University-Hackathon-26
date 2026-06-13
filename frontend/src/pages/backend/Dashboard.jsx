@@ -92,7 +92,7 @@ export default function Dashboard() {
 
       {/* ── Welcome Banner ── */}
       <div
-        className="relative overflow-hidden border-2 border-[#1E293B] rounded-2xl p-6 flex items-center justify-between"
+        className="relative overflow-hidden border-2 border-[#1E293B] rounded-2xl p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
         style={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)', boxShadow: '6px 6px 0px 0px #1E293B' }}
       >
         {/* Confetti shapes */}
@@ -142,7 +142,7 @@ export default function Dashboard() {
           >
             Current Session
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { label: 'Opened By',    value: session.openedBy?.name },
               { label: 'Last Sale',    value: `₹${parseFloat(session.lastSaleAmount || 0).toFixed(2)}` },
@@ -191,45 +191,47 @@ export default function Dashboard() {
             <p className="text-sm font-medium">No orders yet</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#E2E8F0]" style={{ background: 'var(--brand-muted)' }}>
-                {['Order #', 'Table', 'Status', 'Total', 'Time'].map(h => (
-                  <th key={h}
-                    className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider"
-                    style={{ color: 'var(--brand-muted-fg)', fontFamily: "'Outfit', system-ui, sans-serif" }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((o, i) => {
-                const st = STATUS_MAP[o.status] || { label: o.status, color: '#94A3B8', icon: Clock };
-                const StatusIcon = st.icon;
-                return (
-                  <tr key={o.id}
-                    className="border-b border-[#F1F5F9] transition-colors hover:bg-[#FFFDF5]">
-                    <td className="px-6 py-3 text-sm font-bold font-mono" style={{ color: 'var(--brand-fg)' }}>{o.orderNumber}</td>
-                    <td className="px-6 py-3 text-sm" style={{ color: 'var(--brand-muted-fg)' }}>{o.table?.tableNumber || 'Takeaway'}</td>
-                    <td className="px-6 py-3">
-                      <span
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 border-[#1E293B]"
-                        style={{ background: st.color + '30', color: st.color }}
-                      >
-                        <StatusIcon size={10} strokeWidth={2.5} color={st.color} />
-                        {st.label}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3 text-sm font-bold" style={{ color: 'var(--brand-fg)' }}>₹{parseFloat(o.total).toFixed(2)}</td>
-                    <td className="px-6 py-3 text-xs" style={{ color: 'var(--brand-muted-fg)' }}>
-                      {new Date(o.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[500px]">
+              <thead>
+                <tr className="border-b border-[#E2E8F0]" style={{ background: 'var(--brand-muted)' }}>
+                  {['Order #', 'Table', 'Status', 'Total', 'Time'].map(h => (
+                    <th key={h}
+                      className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider"
+                      style={{ color: 'var(--brand-muted-fg)', fontFamily: "'Outfit', system-ui, sans-serif" }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.map((o, i) => {
+                  const st = STATUS_MAP[o.status] || { label: o.status, color: '#94A3B8', icon: Clock };
+                  const StatusIcon = st.icon;
+                  return (
+                    <tr key={o.id}
+                      className="border-b border-[#F1F5F9] transition-colors hover:bg-[#FFFDF5]">
+                      <td className="px-6 py-3 text-sm font-bold font-mono" style={{ color: 'var(--brand-fg)' }}>{o.orderNumber}</td>
+                      <td className="px-6 py-3 text-sm" style={{ color: 'var(--brand-muted-fg)' }}>{o.table?.tableNumber || 'Takeaway'}</td>
+                      <td className="px-6 py-3">
+                        <span
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 border-[#1E293B]"
+                          style={{ background: st.color + '30', color: st.color }}
+                        >
+                          <StatusIcon size={10} strokeWidth={2.5} color={st.color} />
+                          {st.label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-sm font-bold" style={{ color: 'var(--brand-fg)' }}>₹{parseFloat(o.total).toFixed(2)}</td>
+                      <td className="px-6 py-3 text-xs" style={{ color: 'var(--brand-muted-fg)' }}>
+                        {new Date(o.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

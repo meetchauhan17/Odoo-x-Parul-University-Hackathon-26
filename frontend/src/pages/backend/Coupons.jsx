@@ -125,93 +125,97 @@ export default function Coupons() {
 
       {tab === 'coupons' && (
         <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
-                {['Code', 'Type', 'Value', 'Used', 'Active', 'Actions'].map(h => (
-                  <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {coupons.map(c => (
-                <tr key={c.id} className="hover:bg-slate-50/50 transition">
-                  <td className="px-5 py-4 font-mono text-[#F472B6] font-bold text-sm">{c.code}</td>
-                  <td className="px-5 py-4 text-slate-600 font-semibold text-sm">{c.discountType}</td>
-                  <td className="px-5 py-4 text-slate-800 font-extrabold text-sm">
-                    {c.discountType === 'PERCENTAGE' ? `${c.discountValue}%` : `₹${c.discountValue}`}
-                  </td>
-                  <td className="px-5 py-4 text-slate-500 font-semibold text-sm">{c.usageCount}×</td>
-                  <td className="px-5 py-4">
-                    <button
-                      onClick={() => toggleCoupon(c)}
-                      className={`w-12 h-7 rounded-full border-2 border-slate-800 transition relative ${c.isActive ? 'bg-[#34D399]' : 'bg-slate-200'}`}
-                    >
-                      <span className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-slate-800 rounded-full shadow transition-all ${c.isActive ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
-                    </button>
-                  </td>
-                  <td className="px-5 py-4">
-                    <button
-                      onClick={() => deleteCoupon(c.id)}
-                      className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
-                    >
-                      <Trash2 size={12} /> Delete
-                    </button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px] border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
+                  {['Code', 'Type', 'Value', 'Used', 'Active', 'Actions'].map(h => (
+                    <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {coupons.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No coupons yet.</div>}
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {coupons.map(c => (
+                  <tr key={c.id} className="hover:bg-slate-50/50 transition">
+                    <td className="px-5 py-4 font-mono text-[#F472B6] font-bold text-sm">{c.code}</td>
+                    <td className="px-5 py-4 text-slate-600 font-semibold text-sm">{c.discountType}</td>
+                    <td className="px-5 py-4 text-slate-800 font-extrabold text-sm">
+                      {c.discountType === 'PERCENTAGE' ? `${c.discountValue}%` : `₹${c.discountValue}`}
+                    </td>
+                    <td className="px-5 py-4 text-slate-500 font-semibold text-sm">{c.usageCount}×</td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => toggleCoupon(c)}
+                        className={`w-12 h-7 rounded-full border-2 border-slate-800 transition relative ${c.isActive ? 'bg-[#34D399]' : 'bg-slate-200'}`}
+                      >
+                        <span className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-slate-800 rounded-full shadow transition-all ${c.isActive ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
+                      </button>
+                    </td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => deleteCoupon(c.id)}
+                        className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
+                      >
+                        <Trash2 size={12} /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {coupons.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No coupons yet.</div>}
+          </div>
         </div>
       )}
 
       {tab === 'promotions' && (
         <div className="bg-white border-2 border-slate-800 rounded-2xl overflow-hidden shadow-pop">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
-                {['Name', 'Applies To', 'Condition', 'Discount', 'Active', 'Actions'].map(h => (
-                  <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {promos.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50/50 transition">
-                  <td className="px-5 py-4 text-slate-800 font-bold text-sm">{p.name}</td>
-                  <td className="px-5 py-4">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${p.applyTo === 'PRODUCT' ? 'bg-blue-500/10 border-blue-500/20 text-blue-600' : 'bg-green-500/10 border-green-500/20 text-green-600'}`}>
-                      {p.applyTo === 'PRODUCT' ? p.product?.name : 'Order-wide'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-slate-500 font-semibold text-xs">
-                    {p.applyTo === 'PRODUCT' ? `Min qty: ${p.minQuantity}` : `Min spend: ₹${p.minOrderAmount}`}
-                  </td>
-                  <td className="px-5 py-4 text-slate-800 font-extrabold text-sm">
-                    {p.discountType === 'PERCENTAGE' ? `${p.discountValue}%` : `₹${p.discountValue}`} Off
-                  </td>
-                  <td className="px-5 py-4">
-                    <button
-                      onClick={() => togglePromo(p)}
-                      className={`w-12 h-7 rounded-full border-2 border-slate-800 transition relative ${p.isActive ? 'bg-[#34D399]' : 'bg-slate-200'}`}
-                    >
-                      <span className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-slate-800 rounded-full shadow transition-all ${p.isActive ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
-                    </button>
-                  </td>
-                  <td className="px-5 py-4">
-                    <button
-                      onClick={() => deletePromo(p.id)}
-                      className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
-                    >
-                      <Trash2 size={12} /> Delete
-                    </button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[650px] border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-xs text-slate-500 uppercase font-bold border-b-2 border-slate-800">
+                  {['Name', 'Applies To', 'Condition', 'Discount', 'Active', 'Actions'].map(h => (
+                    <th key={h} className="px-5 py-3.5 text-left font-bold text-slate-600">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {promos.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No promotions yet.</div>}
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {promos.map(p => (
+                  <tr key={p.id} className="hover:bg-slate-50/50 transition">
+                    <td className="px-5 py-4 text-slate-800 font-bold text-sm">{p.name}</td>
+                    <td className="px-5 py-4">
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${p.applyTo === 'PRODUCT' ? 'bg-blue-500/10 border-blue-500/20 text-blue-600' : 'bg-green-500/10 border-green-500/20 text-green-600'}`}>
+                        {p.applyTo === 'PRODUCT' ? p.product?.name : 'Order-wide'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-slate-500 font-semibold text-xs">
+                      {p.applyTo === 'PRODUCT' ? `Min qty: ${p.minQuantity}` : `Min spend: ₹${p.minOrderAmount}`}
+                    </td>
+                    <td className="px-5 py-4 text-slate-800 font-extrabold text-sm">
+                      {p.discountType === 'PERCENTAGE' ? `${p.discountValue}%` : `₹${p.discountValue}`} Off
+                    </td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => togglePromo(p)}
+                        className={`w-12 h-7 rounded-full border-2 border-slate-800 transition relative ${p.isActive ? 'bg-[#34D399]' : 'bg-slate-200'}`}
+                      >
+                        <span className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-slate-800 rounded-full shadow transition-all ${p.isActive ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
+                      </button>
+                    </td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => deletePromo(p.id)}
+                        className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-750 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg transition"
+                      >
+                        <Trash2 size={12} /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {promos.length === 0 && <div className="p-10 text-center text-slate-400 font-semibold">No promotions yet.</div>}
+          </div>
         </div>
       )}
 
