@@ -59,6 +59,9 @@ router.put('/:id/password', verifyToken, requireAdmin, passwordValidation, async
 
 router.put('/:id/archive', verifyToken, requireAdmin, async (req, res) => {
   try {
+    if (req.params.id === req.user.id) {
+      return res.status(400).json({ error: 'You cannot archive your own account' });
+    }
     await prisma.user.update({ where: { id: req.params.id }, data: { isActive: false } });
     res.json({ message: 'User archived' });
   } catch (e) {

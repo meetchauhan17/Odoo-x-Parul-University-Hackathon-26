@@ -8,13 +8,14 @@ require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
+const frontendUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
 const io = new Server(server, {
-  cors: { origin: process.env.FRONTEND_URL, credentials: true }
+  cors: { origin: frontendUrl, credentials: true }
 });
 
 app.use(helmet());
 app.set('trust proxy', 1); // Trust Render's reverse proxy for correct IP detection
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(cors({ origin: frontendUrl, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

@@ -317,7 +317,7 @@ export default function KitchenDisplay() {
   /* ── Socket.IO ── */
   useEffect(() => {
     const socketUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api')
-      .replace(/\/api$/, '');
+      .replace(/\/api\/?$/, '');
     const socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });

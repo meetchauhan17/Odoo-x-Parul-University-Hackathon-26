@@ -431,7 +431,7 @@ export default function OrderView({ table, session, existingOrder, initialOrder,
   useEffect(() => {
     if (!currentOrder?.id) return;
     const socketUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api')
-      .replace(/\/api$/, '');
+      .replace(/\/api\/?$/, '');
     const socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });

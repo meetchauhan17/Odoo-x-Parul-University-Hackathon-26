@@ -5,12 +5,18 @@ const prisma = new PrismaClient();
 
 router.get('/dashboard', verifyToken, requireEmployee, async (req, res) => {
   try {
-    const { period, employeeId, sessionId } = req.query;
+    const { period, employeeId, sessionId, from, to } = req.query;
     let dateFilter = {};
     const now = new Date();
     if (period === 'today') { dateFilter = { gte: new Date(now.setHours(0,0,0,0)) }; }
     else if (period === 'week') { const d = new Date(); d.setDate(d.getDate() - 7); dateFilter = { gte: d }; }
     else if (period === 'month') { const d = new Date(); d.setDate(1); dateFilter = { gte: d }; }
+    else if (period === 'custom' && from && to) {
+      dateFilter = {
+        gte: new Date(from),
+        lte: new Date(new Date(to).setHours(23,59,59,999))
+      };
+    }
 
     const where = { status: 'PAID' };
     if (dateFilter.gte) where.createdAt = dateFilter;
@@ -41,12 +47,34 @@ router.get('/dashboard', verifyToken, requireEmployee, async (req, res) => {
     const topOrders = orders.sort((a, b) => parseFloat(b.total) - parseFloat(a.total)).slice(0, 5).map(o => ({ id: o.id, orderNumber: o.orderNumber, total: o.total, createdAt: o.createdAt }));
 
     const trendData = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      const dayStart = new Date(d.setHours(0,0,0,0));
-      const dayEnd = new Date(d.setHours(23,59,59,999));
-      const dayOrders = orders.filter(o => new Date(o.createdAt) >= dayStart && new Date(o.createdAt) <= dayEnd);
-      trendData.push({ date: dayStart.toLocaleDateString('en-IN', { weekday: 'short' }), revenue: dayOrders.reduce((s, o) => s + parseFloat(o.total), 0), orders: dayOrders.length });
+    if (period === 'custom' && from && to) {
+      const start = new Date(from);
+      const end = new Date(to);
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+      const step = diffDays <= 14 ? 1 : Math.ceil(diffDays / 7);
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + step)) {
+        const dayStart = new Date(d.setHours(0,0,0,0));
+        const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate() + step - 1, 23, 59, 59, 999);
+        const rangeOrders = orders.filter(o => {
+          const co = new Date(o.createdAt);
+          return co >= dayStart && co <= dayEnd;
+        });
+        trendData.push({
+          date: dayStart.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+          revenue: rangeOrders.reduce((s, o) => s + parseFloat(o.total), 0),
+          orders: rangeOrders.length
+        });
+      }
+    } else {
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const dayStart = new Date(d.setHours(0,0,0,0));
+        const dayEnd = new Date(d.setHours(23,59,59,999));
+        const dayOrders = orders.filter(o => new Date(o.createdAt) >= dayStart && new Date(o.createdAt) <= dayEnd);
+        trendData.push({ date: dayStart.toLocaleDateString('en-IN', { weekday: 'short' }), revenue: dayOrders.reduce((s, o) => s + parseFloat(o.total), 0), orders: dayOrders.length });
+      }
     }
 
     res.json({ totalOrders, revenue, avgOrderValue, topProducts, topCategories, topOrders, trendData });
@@ -56,11 +84,17 @@ router.get('/dashboard', verifyToken, requireEmployee, async (req, res) => {
 /* ─── CSV Export — sends file directly from server ──────── */
 router.get('/export-csv', verifyToken, requireEmployee, async (req, res) => {
   try {
-    const { period, employeeId } = req.query;
+    const { period, employeeId, from, to } = req.query;
     let dateFilter = {};
     if (period === 'today') { dateFilter = { gte: new Date(new Date().setHours(0,0,0,0)) }; }
     else if (period === 'week')  { const d = new Date(); d.setDate(d.getDate() - 7); dateFilter = { gte: d }; }
     else if (period === 'month') { const d = new Date(); d.setDate(1); dateFilter = { gte: d }; }
+    else if (period === 'custom' && from && to) {
+      dateFilter = {
+        gte: new Date(from),
+        lte: new Date(new Date(to).setHours(23,59,59,999))
+      };
+    }
 
     const where = { status: 'PAID' };
     if (dateFilter.gte) where.createdAt = dateFilter;
@@ -134,11 +168,17 @@ router.get('/export-csv', verifyToken, requireEmployee, async (req, res) => {
 router.get('/export-xlsx', verifyToken, requireEmployee, async (req, res) => {
   try {
     const XLSX = require('xlsx');
-    const { period, employeeId } = req.query;
+    const { period, employeeId, from, to } = req.query;
     let dateFilter = {};
     if (period === 'today') { dateFilter = { gte: new Date(new Date().setHours(0,0,0,0)) }; }
     else if (period === 'week')  { const d = new Date(); d.setDate(d.getDate() - 7); dateFilter = { gte: d }; }
     else if (period === 'month') { const d = new Date(); d.setDate(1); dateFilter = { gte: d }; }
+    else if (period === 'custom' && from && to) {
+      dateFilter = {
+        gte: new Date(from),
+        lte: new Date(new Date(to).setHours(23,59,59,999))
+      };
+    }
 
     const where = { status: 'PAID' };
     if (dateFilter.gte) where.createdAt = dateFilter;

@@ -14,7 +14,10 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { name, color } = req.body;
     if (!name) return res.status(400).json({ error: 'Name required' });
-    const cat = await prisma.productCategory.create({ data: { name, color: color || '#6B7280' } });
+    const normalized = name.trim();
+    const exists = await prisma.productCategory.findFirst({ where: { name: { equals: normalized, mode: 'insensitive' } } });
+    if (exists) return res.status(400).json({ error: 'Category name already exists' });
+    const cat = await prisma.productCategory.create({ data: { name: normalized, color: color || '#6B7280' } });
     res.status(201).json(cat);
   } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
 });
@@ -22,7 +25,14 @@ router.post('/', verifyToken, requireAdmin, async (req, res) => {
 router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { name, color } = req.body;
-    const cat = await prisma.productCategory.update({ where: { id: req.params.id }, data: { name, color } });
+    if (name) {
+      const normalized = name.trim();
+      const exists = await prisma.productCategory.findFirst({
+        where: { name: { equals: normalized, mode: 'insensitive' }, NOT: { id: req.params.id } }
+      });
+      if (exists) return res.status(400).json({ error: 'Category name already exists' });
+    }
+    const cat = await prisma.productCategory.update({ where: { id: req.params.id }, data: { name: name ? name.trim() : undefined, color } });
     res.json(cat);
   } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
 });

@@ -17,7 +17,7 @@ const calcOrder = async (lines, couponCode) => {
   const { totalDiscount: promoDiscount } = await applyPromotions(lines, subtotal);
   let couponDiscount = 0;
   if (couponCode) {
-    const coupon = await prisma.coupon.findFirst({ where: { code: couponCode.toUpperCase(), isActive: true } });
+    const coupon = await prisma.coupon.findFirst({ where: { code: couponCode.trim().toUpperCase(), isActive: true } });
     if (coupon) {
       couponDiscount = coupon.discountType === 'PERCENTAGE' ? (subtotal * parseFloat(coupon.discountValue)) / 100 : parseFloat(coupon.discountValue);
     }

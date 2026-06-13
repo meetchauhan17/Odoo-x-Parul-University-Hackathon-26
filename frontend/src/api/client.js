@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://odoo-cafe-pos-81do.onrender.com/api';
 
@@ -9,7 +10,7 @@ const api = axios.create({
 
 let accessToken = null;
 export const setToken = (t) => { accessToken = t; };
-export const getToken = () => accessToken;
+export const getToken = () => accessToken || useAuthStore.getState().accessToken;
 
 // Clears persisted auth so GuestGuard sees the user as logged out
 const clearAuth = () => {
@@ -17,7 +18,8 @@ const clearAuth = () => {
 };
 
 api.interceptors.request.use((config) => {
-  if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+  const token = useAuthStore.getState().accessToken || accessToken;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -30,12 +32,15 @@ api.interceptors.response.use(
       try {
         const res = await axios.post(`${BASE_URL}/auth/refresh`,
           {}, { withCredentials: true });
-        accessToken = res.data.accessToken;
-        original.headers.Authorization = `Bearer ${accessToken}`;
+        const newAccessToken = res.data.accessToken;
+        setToken(newAccessToken);
+        useAuthStore.getState().setAuth(useAuthStore.getState().user, newAccessToken);
+        original.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(original);
-      } catch {
+      } catch (err2) {
         // Clear auth state so GuestGuard redirects properly
-        accessToken = null;
+        setToken(null);
+        useAuthStore.getState().logout();
         clearAuth();
         window.location.href = '/login';
       }

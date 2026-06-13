@@ -112,12 +112,16 @@ export default function Reports() {
     setLoading(true);
     try {
       const params = new URLSearchParams({ period });
+      if (period === 'custom') {
+        if (customFrom) params.set('from', customFrom);
+        if (customTo) params.set('to', customTo);
+      }
       if (employeeId) params.set('employeeId', employeeId);
       const res = await api.get(`/reports/dashboard?${params}`);
       setData(res);
     } catch { toast.error('Failed to load report'); }
     finally { setLoading(false); }
-  }, [period, employeeId]);
+  }, [period, employeeId, customFrom, customTo]);
 
   /* ── PDF: hidden iframe (no popup blocker) ──────────── */
   const handleExportPDF = () => {

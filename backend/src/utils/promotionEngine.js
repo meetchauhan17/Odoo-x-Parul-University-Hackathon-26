@@ -10,17 +10,19 @@ const applyPromotions = async (lines, subtotal) => {
     if (promo.applyTo === 'PRODUCT') {
       const line = lines.find(l => l.productId === promo.productId);
       if (line && line.quantity >= promo.minQuantity) {
+        const discountVal = parseFloat(promo.discountValue);
         const disc = promo.discountType === 'PERCENTAGE'
-          ? (subtotal * promo.discountValue) / 100
-          : parseFloat(promo.discountValue);
+          ? (subtotal * discountVal) / 100
+          : discountVal;
         totalDiscount += disc;
         appliedPromos.push({ name: promo.name, discount: disc });
       }
     }
-    if (promo.applyTo === 'ORDER' && subtotal >= promo.minOrderAmount) {
+    if (promo.applyTo === 'ORDER' && subtotal >= parseFloat(promo.minOrderAmount)) {
+      const discountVal = parseFloat(promo.discountValue);
       const disc = promo.discountType === 'PERCENTAGE'
-        ? (subtotal * promo.discountValue) / 100
-        : parseFloat(promo.discountValue);
+        ? (subtotal * discountVal) / 100
+        : discountVal;
       totalDiscount += disc;
       appliedPromos.push({ name: promo.name, discount: disc });
     }

@@ -35,7 +35,12 @@ router.delete('/:id', verifyToken, requireEmployee, async (req, res) => {
   try {
     await prisma.customer.delete({ where: { id: req.params.id } });
     res.json({ message: 'Customer deleted' });
-  } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
+  } catch (e) {
+    if (e.code === 'P2003') {
+      return res.status(400).json({ error: 'Cannot delete customer who has existing orders' });
+    }
+    res.status(500).json({ error: 'Something went wrong' });
+  }
 });
 
 module.exports = router;

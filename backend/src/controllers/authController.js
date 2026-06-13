@@ -32,10 +32,11 @@ exports.signup = async (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'All fields required' });
     if (password.length < 8) return res.status(400).json({ error: 'Password min 8 characters' });
-    const exists = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = email.toLowerCase().trim();
+    const exists = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (exists) return res.status(400).json({ error: 'Email already registered' });
     const hashed = await bcrypt.hash(password, 12);
-    const user = await prisma.user.create({ data: { name, email, password: hashed, role: 'ADMIN' } });
+    const user = await prisma.user.create({ data: { name, email: normalizedEmail, password: hashed, role: 'ADMIN' } });
     const { accessToken, refreshToken } = generateTokens(user);
     setRefreshCookie(res, refreshToken);
     res.status(201).json({ accessToken, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
@@ -46,7 +47,8 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-    const user = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (!user || !await bcrypt.compare(password, user.password))
       return res.status(401).json({ error: 'Invalid credentials' });
     if (!user.isActive) return res.status(403).json({ error: 'Account deactivated' });
@@ -70,6 +72,11 @@ exports.refresh = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  res.clearCookie('refreshToken');
+  const isProd = process.env.NODE_ENV === 'production';
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    sameSite: isProd ? 'none' : 'strict',
+    secure:   isProd,
+  });
   res.json({ message: 'Logged out' });
 };
