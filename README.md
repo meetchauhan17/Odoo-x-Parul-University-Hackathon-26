@@ -410,7 +410,7 @@ cafe-pos/
 ### Prerequisites
 
 - Node.js v18 or higher
-- PostgreSQL 14+ (local instance or [Supabase](https://supabase.com) free tier)
+- PostgreSQL 14+ (local or cloud instance)
 - npm v9+
 
 ---
@@ -502,12 +502,11 @@ npm run dev
 
 ## Production Deployment Guide
 
-### Step 1 — Database (Supabase)
+### Step 1 — Database (Render PostgreSQL)
 
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Go to **Settings > Database** and copy the **Connection String (URI mode)**.
-3. Replace `[YOUR-PASSWORD]` with your database password.
-4. This becomes the value for `DATABASE_URL`.
+1. Log in to [render.com](https://render.com) and click **New > PostgreSQL**.
+2. Name your database (e.g., `cafe-pos-db`), select your preferred region, and choose the database package.
+3. Once created, copy the **Internal Database URL** (to connect from services on Render) and the **External Database URL** (for local/CLI administration).
 
 ---
 
@@ -521,7 +520,7 @@ npm run dev
 
    | Variable | Value |
    |---|---|
-   | `DATABASE_URL` | Supabase connection string |
+   | `DATABASE_URL` | Render Internal Database URL |
    | `JWT_SECRET` | Random 32+ character string |
    | `JWT_REFRESH_SECRET` | Random 32+ character string |
    | `FRONTEND_URL` | Vercel deployment URL (add after Step 3) |
