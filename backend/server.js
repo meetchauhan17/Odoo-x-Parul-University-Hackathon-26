@@ -36,10 +36,18 @@ app.use('/api/reports',        require('./src/routes/reports'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+/* ── 404 handler ───────────────────────────────────── */
+app.use((req, res) => {
+  res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
+});
+
+/* ── Global error handler ───────────────────────────── */
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error(`[ERROR] ${req.method} ${req.originalUrl}`, err.message);
+  if (process.env.NODE_ENV !== 'production') console.error(err.stack);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
 });
 
 io.on('connection', (socket) => {

@@ -5,13 +5,18 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^5.22.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -21,7 +26,7 @@
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.11",
-    "prisma": "^7.8.0",
+    "prisma": "^5.22.0",
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.3"
   }

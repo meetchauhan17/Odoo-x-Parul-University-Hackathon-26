@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum PromotionTarget {
+  PRODUCT
+  ORDER
+}
+
+enum PaymentMethodName {
+  CASH
+  CARD
+  UPI
+}
+
+enum SessionStatus {
+  OPEN
+  CLOSED
+}
+
+enum OrderStatus {
+  DRAFT
+  SENT_TO_KITCHEN
+  PAID
+  CANCELLED
+}
+
+enum KdsStage {
+  TO_COOK
+  PREPARING
+  COMPLETED
+}
+
+enum KdsItemStatus {
+  PENDING
+  DONE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLOYEE)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  sessions  PosSession[]
+  orders    Order[]
+}
+
+model ProductCategory {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  color     String    @default("#6B7280")
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  name          String
+  categoryId    String
+  price         Decimal         @db.Decimal(10,2)
+  unitOfMeasure String          @default("piece")
+  tax           Decimal         @default(0) @db.Decimal(5,2)
+  description   String?
+  showOnKds     Boolean         @default(true)
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  category      ProductCategory @relation(fields: [categoryId], references: [id])
+  orderLines    OrderLine[]
+  promotions    Promotion[]
+}
+
+model PaymentMethod {
+  id        String            @id @default(uuid())
+  name      PaymentMethodName @unique
+  isEnabled Boolean           @default(true)
+  upiId     String?
+}
+
+model Floor {
+  id       String   @id @default(uuid())
+  name     String
+  isActive Boolean  @default(true)
+  tables   Table[]
+}
+
+model Table {
+  id             String   @id @default(uuid())
+  tableNumber    String
+  seats          Int
+  floorId        String
+  isActive       Boolean  @default(true)
+  currentOrderId String?
+  floor          Floor    @relation(fields: [floorId], references: [id])
+  orders         Order[]
+}
+
+model Coupon {
+  id            String       @id @default(uuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Decimal      @db.Decimal(10,2)
+  isActive      Boolean      @default(true)
+  usageCount    Int          @default(0)
+  createdAt     DateTime     @default(now())
+}
+
+model Promotion {
+  id              String          @id @default(uuid())
+  name            String
+  applyTo         PromotionTarget
+  productId       String?
+  minQuantity     Int?
+  minOrderAmount  Decimal?        @db.Decimal(10,2)
+  discountType    DiscountType
+  discountValue   Decimal         @db.Decimal(10,2)
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  product         Product?        @relation(fields: [productId], references: [id])
+}
+
+model PosSession {
+  id             String        @id @default(uuid())
+  openedAt       DateTime      @default(now())
+  closedAt       DateTime?
+  openedById     String
+  lastSaleAmount Decimal       @default(0) @db.Decimal(10,2)
+  totalOrders    Int           @default(0)
+  totalRevenue   Decimal       @default(0) @db.Decimal(10,2)
+  status         SessionStatus @default(OPEN)
+  openedBy       User          @relation(fields: [openedById], references: [id])
+  orders         Order[]
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Order {
+  id               String      @id @default(uuid())
+  orderNumber      String      @unique
+  sessionId        String
+  tableId          String?
+  customerId       String?
+  status           OrderStatus @default(DRAFT)
+  subtotal         Decimal     @default(0) @db.Decimal(10,2)
+  taxAmount        Decimal     @default(0) @db.Decimal(10,2)
+  discountAmount   Decimal     @default(0) @db.Decimal(10,2)
+  total            Decimal     @default(0) @db.Decimal(10,2)
+  paymentMethod    String?
+  paymentReference String?
+  couponCode       String?
+  createdById      String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  session          PosSession  @relation(fields: [sessionId], references: [id])
+  table            Table?      @relation(fields: [tableId], references: [id])
+  customer         Customer?   @relation(fields: [customerId], references: [id])
+  createdBy        User        @relation(fields: [createdById], references: [id])
+  lines            OrderLine[]
+  kdsTicket        KdsTicket?
+}
+
+model OrderLine {
+  id         String        @id @default(uuid())
+  orderId    String
+  productId  String
+  quantity   Int
+  unitPrice  Decimal       @db.Decimal(10,2)
+  lineTotal  Decimal       @db.Decimal(10,2)
+  discount   Decimal       @default(0) @db.Decimal(10,2)
+  kdsStatus  KdsItemStatus @default(PENDING)
+  order      Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product       @relation(fields: [productId], references: [id])
+}
+
+model KdsTicket {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  stage     KdsStage @default(TO_COOK)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
