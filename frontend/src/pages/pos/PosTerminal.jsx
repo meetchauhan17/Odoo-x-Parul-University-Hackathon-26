@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import api from '../../api/client';
@@ -14,7 +14,7 @@ import {
   Coffee, Receipt, ClipboardList, UserCircle, LayoutGrid,
   Search, ChefHat, LogOut, Lock, LayoutDashboard,
   UtensilsCrossed, Tag, Ticket, BarChart3, Settings, ChevronRight,
-  ShoppingBag, TrendingUp, IndianRupee, Package, Clock, Activity
+  ShoppingBag, TrendingUp, IndianRupee, Package, Clock, Activity, X
 } from 'lucide-react';
 
 /* ── session timer ──────────────────────────────── */
@@ -447,40 +447,40 @@ export default function PosTerminal() {
           </div>
         )}
         {currentView === 'welcome' && (
-          <div className="h-full flex flex-col overflow-y-auto" style={{ background: '#F1F5F9' }}>
+          <div className="h-full flex flex-col overflow-y-auto" style={{ background: 'var(--brand-bg)' }}>
 
-            {/* ── Dark Header Band ── */}
+            {/* ── Welcome Header Card ── */}
             <div
-              className="px-8 py-5 flex items-center justify-between shrink-0"
-              style={{ background: '#0F172A', borderBottom: '1px solid #1E293B' }}
+              className="px-8 py-5 flex items-center justify-between shrink-0 border-2 border-[#1E293B] rounded-2xl mx-6 mt-6 bg-white animate-fadeIn"
+              style={{ boxShadow: 'var(--pop-shadow)' }}
             >
               <div className="flex items-center gap-4">
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: ACCENT, boxShadow: '0 0 0 3px rgba(139,92,246,0.3)' }}
+                  className="w-11 h-11 rounded-xl flex items-center justify-center border-2 border-[#1E293B] shrink-0"
+                  style={{ background: ACCENT, boxShadow: 'var(--pop-shadow-sm)' }}
                 >
-                  <Coffee size={22} strokeWidth={2.5} color="#fff" />
+                  <Coffee size={20} strokeWidth={2.5} color="#fff" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white leading-tight" style={{ fontFamily: FONT_HEADING }}>
+                  <h2 className="text-lg font-black text-[#1E293B] leading-tight font-outfit">
                     Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, {user?.name?.split(' ')[0] || 'Barista'}
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5" style={{ fontFamily: FONT_BODY }}>
+                  <p className="text-xs text-slate-500 font-semibold mt-0.5 font-jakarta">
                     {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                 </div>
               </div>
               {session && (
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)' }}>
-                  <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: EMERALD }} />
-                  <span className="text-xs font-bold" style={{ color: EMERALD }}>Session Open</span>
-                  {sessionTimer && <span className="text-xs text-slate-400 font-medium">· {sessionTimer}</span>}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 border-[#1E293B] bg-[#ECFDF5]" style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-black text-emerald-600 font-outfit">SESSION OPEN</span>
+                  {sessionTimer && <span className="text-xs text-slate-500 font-semibold font-jakarta">· {sessionTimer}</span>}
                 </div>
               )}
             </div>
 
             {/* ── Stats Row ── */}
-            <div className="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
+            <div className="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4 shrink-0">
               {[
                 {
                   label: "Today's Orders",
@@ -513,15 +513,15 @@ export default function PosTerminal() {
               ].map(({ label, value, icon: Icon, color, bg }) => (
                 <div
                   key={label}
-                  className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
-                  style={{ border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+                  className="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 border-2 border-[#1E293B] transition-all duration-200 hover:-translate-y-0.5"
+                  style={{ boxShadow: 'var(--pop-shadow-sm)' }}
                 >
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: bg }}>
-                    <Icon size={17} strokeWidth={2.2} color={color} />
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center border-2 border-[#1E293B] shrink-0" style={{ background: bg }}>
+                    <Icon size={17} strokeWidth={2.5} color={color} />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-lg font-black truncate" style={{ color: '#0F172A', fontFamily: FONT_HEADING, lineHeight: 1.1 }}>{value}</div>
-                    <div className="text-[10px] font-semibold uppercase tracking-wide mt-0.5 truncate" style={{ color: '#94A3B8' }}>{label}</div>
+                    <div className="text-lg font-black truncate font-outfit" style={{ color: '#0F172A', lineHeight: 1.1 }}>{value}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5 truncate font-jakarta" style={{ color: '#94A3B8' }}>{label}</div>
                   </div>
                 </div>
               ))}
@@ -534,7 +534,7 @@ export default function PosTerminal() {
               <div className="lg:col-span-2 flex flex-col gap-4">
 
                 {/* Label */}
-                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#94A3B8', fontFamily: FONT_HEADING }}>New Order</p>
+                <p className="text-[10px] font-black uppercase tracking-widest font-outfit" style={{ color: '#94A3B8' }}>New Order</p>
 
                 {/* 2 hero cards side by side */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1" style={{ minHeight: 0 }}>
@@ -542,30 +542,30 @@ export default function PosTerminal() {
                   {/* Dine-In */}
                   <button
                     onClick={() => setCurrentView('table-view')}
-                    className="relative overflow-hidden rounded-2xl p-6 text-left group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]"
+                    className="relative overflow-hidden rounded-2xl p-6 text-left group transition-all duration-200 hover:rotate-[-0.5deg] hover:scale-[1.01] active:translate-x-[2px] active:translate-y-[2px] border-2 border-[#1E293B]"
                     style={{
-                      background: 'linear-gradient(145deg, #1E1B4B 0%, #4C1D95 60%, #6D28D9 100%)',
-                      border: '1px solid rgba(139,92,246,0.4)',
-                      boxShadow: '0 4px 24px rgba(109,40,217,0.35)',
+                      background: 'var(--brand-accent)',
+                      boxShadow: 'var(--pop-shadow)',
                       minHeight: 180,
                     }}
                   >
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'radial-gradient(circle at 30% 50%, rgba(167,139,250,0.15) 0%, transparent 70%)' }} />
+                    {/* Pattern fill on background */}
+                    <div className="absolute inset-0 opacity-15 dot-grid pointer-events-none" />
                     {/* BG icon */}
-                    <div className="absolute -right-3 -bottom-3 opacity-[0.07]">
+                    <div className="absolute -right-3 -bottom-3 opacity-[0.12] pointer-events-none">
                       <LayoutGrid size={110} strokeWidth={1} color="#fff" />
                     </div>
                     <div className="relative z-10 flex flex-col justify-between h-full">
                       <div>
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
-                          <LayoutGrid size={20} strokeWidth={2.5} color="#C4B5FD" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center border-2 border-[#1E293B] mb-4 bg-white" style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}>
+                          <LayoutGrid size={18} strokeWidth={2.5} style={{ color: 'var(--brand-accent)' }} />
                         </div>
-                        <h3 className="text-lg font-black text-white" style={{ fontFamily: FONT_HEADING }}>Dine-In Orders</h3>
-                        <p className="text-xs mt-1 leading-relaxed" style={{ color: '#A78BFA' }}>Select a table from the floor map and take orders for seated guests.</p>
+                        <h3 className="text-lg font-black text-white font-outfit">Dine-In Orders</h3>
+                        <p className="text-xs mt-1 leading-relaxed text-violet-100 font-jakarta">Select a table from the floor map and take orders for seated guests.</p>
                       </div>
-                      <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-1.5 transition-colors" style={{ background: 'rgba(255,255,255,0.1)', color: '#E9D5FF' }}>
-                        Open Floor Map <ChevronRight size={13} />
+                      <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-black rounded-xl px-3.5 py-2 transition-colors bg-white border-2 border-[#1E293B] text-slate-800" style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}>
+                        <span>Open Floor Map</span>
+                        <ChevronRight size={13} strokeWidth={3} />
                       </div>
                     </div>
                   </button>
@@ -573,35 +573,35 @@ export default function PosTerminal() {
                   {/* Takeaway */}
                   <button
                     onClick={handleNoTable}
-                    className="relative overflow-hidden rounded-2xl p-6 text-left group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]"
+                    className="relative overflow-hidden rounded-2xl p-6 text-left group transition-all duration-200 hover:rotate-[0.5deg] hover:scale-[1.01] active:translate-x-[2px] active:translate-y-[2px] border-2 border-[#1E293B]"
                     style={{
-                      background: 'linear-gradient(145deg, #064E3B 0%, #065F46 60%, #059669 100%)',
-                      border: '1px solid rgba(52,211,153,0.35)',
-                      boxShadow: '0 4px 24px rgba(5,150,105,0.30)',
+                      background: 'var(--brand-quaternary)',
+                      boxShadow: 'var(--pop-shadow)',
                       minHeight: 180,
                     }}
                   >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'radial-gradient(circle at 30% 50%, rgba(52,211,153,0.15) 0%, transparent 70%)' }} />
-                    <div className="absolute -right-3 -bottom-3 opacity-[0.07]">
-                      <ShoppingBag size={110} strokeWidth={1} color="#fff" />
+                    <div className="absolute inset-0 opacity-15 dot-grid pointer-events-none" />
+                    <div className="absolute -right-3 -bottom-3 opacity-[0.12] pointer-events-none">
+                      <ShoppingBag size={110} strokeWidth={1} color="#1E293B" />
                     </div>
                     <div className="relative z-10 flex flex-col justify-between h-full">
                       <div>
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
-                          <ShoppingBag size={20} strokeWidth={2.5} color="#6EE7B7" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center border-2 border-[#1E293B] mb-4 bg-white" style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}>
+                          <ShoppingBag size={18} strokeWidth={2.5} style={{ color: 'var(--brand-quaternary)' }} />
                         </div>
-                        <h3 className="text-lg font-black text-white" style={{ fontFamily: FONT_HEADING }}>Takeaway / Walk-In</h3>
-                        <p className="text-xs mt-1 leading-relaxed" style={{ color: '#6EE7B7' }}>Bill walk-in or phone orders instantly — no table needed.</p>
+                        <h3 className="text-lg font-black text-slate-800 font-outfit">Takeaway / Walk-In</h3>
+                        <p className="text-xs mt-1 leading-relaxed text-[#064E3B] font-jakarta">Bill walk-in or phone orders instantly — no table needed.</p>
                       </div>
-                      <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-1.5 transition-colors" style={{ background: 'rgba(255,255,255,0.1)', color: '#A7F3D0' }}>
-                        Start Billing <ChevronRight size={13} />
+                      <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-black rounded-xl px-3.5 py-2 transition-colors bg-white border-2 border-[#1E293B] text-slate-800" style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}>
+                        <span>Start Billing</span>
+                        <ChevronRight size={13} strokeWidth={3} />
                       </div>
                     </div>
                   </button>
                 </div>
 
                 {/* Label */}
-                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#94A3B8', fontFamily: FONT_HEADING }}>Management</p>
+                <p className="text-[10px] font-black uppercase tracking-widest font-outfit" style={{ color: '#94A3B8' }}>Management</p>
 
                 {/* 3 utility cards */}
                 <div className="grid grid-cols-3 gap-3">
@@ -613,16 +613,16 @@ export default function PosTerminal() {
                     <button
                       key={label}
                       onClick={onClick}
-                      className="bg-white rounded-xl p-4 text-left group transition-all duration-150 hover:-translate-y-0.5"
-                      style={{ border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.boxShadow = `0 4px 12px ${color}22`; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)'; }}
+                      className="bg-white rounded-2xl p-4 text-left group transition-all duration-200 border-2 border-[#1E293B] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+                      style={{ boxShadow: 'var(--pop-shadow-sm)' }}
+                      onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--pop-shadow)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--pop-shadow-sm)'; }}
                     >
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2.5" style={{ background: bg }}>
-                        <Icon size={17} strokeWidth={2.3} color={color} />
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center border-2 border-[#1E293B] mb-2.5 shrink-0" style={{ background: bg }}>
+                        <Icon size={17} strokeWidth={2.5} color={color} />
                       </div>
-                      <p className="text-sm font-extrabold text-slate-800" style={{ fontFamily: FONT_HEADING }}>{label}</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>
+                      <p className="text-sm font-extrabold text-slate-800 font-outfit">{label}</p>
+                      <p className="text-[10px] text-slate-400 font-bold font-jakarta mt-0.5 leading-tight">{sub}</p>
                     </button>
                   ))}
                 </div>
@@ -630,25 +630,25 @@ export default function PosTerminal() {
 
               {/* RIGHT: Session Info Panel (1/3 width) */}
               <div className="flex flex-col gap-4">
-                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#94A3B8', fontFamily: FONT_HEADING }}>Session Info</p>
+                <p className="text-[10px] font-black uppercase tracking-widest font-outfit" style={{ color: '#94A3B8' }}>Session Info</p>
 
                 {/* Session card */}
-                <div className="bg-white rounded-2xl overflow-hidden flex-1" style={{ border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div className="bg-white rounded-2xl overflow-hidden flex-1 border-2 border-[#1E293B] flex flex-col" style={{ boxShadow: 'var(--pop-shadow)' }}>
                   {/* Card header */}
-                  <div className="px-5 py-4" style={{ background: '#0F172A', borderBottom: '1px solid #1E293B' }}>
+                  <div className="px-5 py-4 border-b-2 border-[#1E293B] bg-[#FFFDF5]">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: ACCENT }}>
-                        <Activity size={15} strokeWidth={2.5} color="#fff" />
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center border-2 border-[#1E293B]" style={{ background: ACCENT }}>
+                        <Activity size={14} strokeWidth={2.5} color="#fff" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-white" style={{ fontFamily: FONT_HEADING }}>Current Session</p>
-                        <p className="text-[10px]" style={{ color: '#64748B' }}>POS Terminal · {user?.role}</p>
+                        <p className="text-sm font-extrabold text-slate-800 font-outfit">Current Session</p>
+                        <p className="text-[10px] font-semibold font-jakarta" style={{ color: '#64748B' }}>POS Terminal · {user?.role}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Session detail rows */}
-                  <div className="px-5 py-4 space-y-3">
+                  <div className="px-5 py-4 space-y-3 flex-1 overflow-y-auto">
                     {[
                       { label: 'Operator', value: user?.name || '—' },
                       { label: 'Opened At', value: session?.openedAt ? new Date(session.openedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—' },
@@ -656,50 +656,44 @@ export default function PosTerminal() {
                       { label: 'Orders Today', value: dashStats?.ordersCount ?? '—' },
                       { label: 'Revenue Today', value: dashStats?.totalRevenue != null ? `₹${Number(dashStats.totalRevenue).toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '—' },
                     ].map(({ label, value }) => (
-                      <div key={label} className="flex items-center justify-between">
-                        <span className="text-xs font-medium" style={{ color: '#94A3B8' }}>{label}</span>
-                        <span className="text-xs font-bold text-slate-800" style={{ fontFamily: FONT_HEADING }}>{value}</span>
+                      <div key={label} className="flex items-center justify-between pb-1.5 border-b border-slate-100 last:border-0 last:pb-0">
+                        <span className="text-xs font-semibold font-jakarta" style={{ color: '#94A3B8' }}>{label}</span>
+                        <span className="text-xs font-extrabold text-slate-800 font-outfit">{value}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Status badge */}
                   <div className="px-5 pb-4">
-                    <div className="w-full rounded-lg py-2 flex items-center justify-center gap-2" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-                      <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#22C55E' }} />
-                      <span className="text-xs font-bold" style={{ color: '#16A34A' }}>Session Active</span>
+                    <div className="w-full rounded-xl py-2 flex items-center justify-center gap-2 border-2 border-[#1E293B] bg-[#ECFDF5]" style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}>
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-black text-emerald-600 font-outfit">SESSION ACTIVE</span>
                     </div>
                   </div>
 
-                  <div className="border-t px-5 py-4 space-y-2" style={{ borderColor: '#F1F5F9' }}>
+                  <div className="border-t-2 border-[#1E293B] px-5 py-4 space-y-2 bg-[#FFFDF5]">
                     {user?.role === 'ADMIN' && (
                       <button
                         onClick={() => navigate('/backend')}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors text-left"
-                        style={{ color: '#334155' }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-black border-2 border-[#1E293B] bg-white transition hover:-translate-y-0.5 active:translate-y-0.5 font-outfit text-slate-800"
+                        style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}
                       >
-                        <LayoutDashboard size={14} strokeWidth={2.3} color={ACCENT} /> Backend Dashboard
+                        <LayoutDashboard size={14} strokeWidth={2.5} color={ACCENT} /> Backend Dashboard
                       </button>
                     )}
                     <button
                       onClick={openCloseConfirm}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors text-left"
-                      style={{ color: '#92400E' }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#FFFBEB'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-black border-2 border-[#1E293B] bg-[#FEF3C7] transition hover:-translate-y-0.5 active:translate-y-0.5 font-outfit text-slate-800"
+                      style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}
                     >
-                      <Lock size={14} strokeWidth={2.3} color="#D97706" /> Close Session
+                      <Lock size={14} strokeWidth={2.5} color="#D97706" /> Close Session
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors text-left"
-                      style={{ color: '#991B1B' }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-black border-2 border-[#1E293B] bg-[#FEE2E2] transition hover:-translate-y-0.5 active:translate-y-0.5 font-outfit text-red-700"
+                      style={{ boxShadow: '2px 2px 0px 0px #1E293B' }}
                     >
-                      <LogOut size={14} strokeWidth={2.3} color="#EF4444" /> Logout
+                      <LogOut size={14} strokeWidth={2.5} color="#EF4444" /> Logout
                     </button>
                   </div>
                 </div>
