@@ -397,7 +397,7 @@ router.post('/:id/send-receipt', verifyToken, requireEmployee, async (req, res) 
     res.json({ message: `Receipt sent to ${email}` });
   } catch (e) {
     console.error('Email error:', e);
-    res.status(500).json({ error: 'Failed to send email. Check EMAIL_USER and EMAIL_PASS in .env' });
+    res.status(500).json({ error: e.message || 'Failed to send email. Check EMAIL_USER and EMAIL_PASS in env variables.' });
   }
 });
 

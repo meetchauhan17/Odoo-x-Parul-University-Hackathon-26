@@ -10,6 +10,9 @@ const transporter = nodemailer.createTransport({
     pass: (process.env.EMAIL_PASS || '').replace(/\s/g, ''), // strip spaces from app-password
   },
   tls: { rejectUnauthorized: false },
+  connectionTimeout: 5000, // 5 seconds
+  greetingTimeout: 5000,
+  socketTimeout: 5000,
 });
 
 /* ── verify connection at startup so errors appear in logs ── */
@@ -19,6 +22,9 @@ transporter.verify((err) => {
 });
 
 const sendReceiptEmail = async (to, order) => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    throw new Error('Email credentials (EMAIL_USER / EMAIL_PASS) are not configured on the hosted server.');
+  }
   const itemRows = order.lines.map(l =>
     `<tr>
       <td style="padding:8px;border-bottom:1px solid #333">${l.product.name}</td>
