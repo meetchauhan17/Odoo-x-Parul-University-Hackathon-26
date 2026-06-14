@@ -93,16 +93,15 @@ router.post('/', verifyToken, requireEmployee, async (req, res) => {
       customerConnect = [{ id: customerId }];
     }
 
-    // Verify customers belong to organization
+    // Verify customers exist globally
     if (customerConnect.length > 0) {
       const dbCustCount = await prisma.customer.count({
         where: {
-          id: { in: customerConnect.map(c => c.id) },
-          organizationId: req.user.organizationId
+          id: { in: customerConnect.map(c => c.id) }
         }
       });
       if (dbCustCount !== customerConnect.length) {
-        return res.status(404).json({ error: 'One or more customers not found or access denied' });
+        return res.status(404).json({ error: 'One or more customers not found' });
       }
     }
 
@@ -298,16 +297,15 @@ router.put('/:id', verifyToken, requireEmployee, async (req, res) => {
       customerConnect = [{ id: customerId }];
     }
 
-    // Verify customers belong to organization
+    // Verify customers exist globally
     if (customerConnect.length > 0) {
       const dbCustCount = await prisma.customer.count({
         where: {
-          id: { in: customerConnect.map(c => c.id) },
-          organizationId: req.user.organizationId
+          id: { in: customerConnect.map(c => c.id) }
         }
       });
       if (dbCustCount !== customerConnect.length) {
-        return res.status(404).json({ error: 'One or more customers not found or access denied' });
+        return res.status(404).json({ error: 'One or more customers not found' });
       }
     }
 
