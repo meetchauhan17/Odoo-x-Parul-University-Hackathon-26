@@ -790,7 +790,7 @@ export default function OrderView({ table, session, existingOrder, initialOrder,
       toast.success('Order sent to kitchen!', {
         icon: <ChefHat size={18} className="text-blue-400" />
       });
-    } catch { toast.error('Failed to send to kitchen'); }
+    } catch (err) { toast.error(err?.error || err?.message || 'Failed to send to kitchen'); }
     finally { setKitchenLoading(false); }
   };
 
