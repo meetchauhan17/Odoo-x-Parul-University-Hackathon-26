@@ -130,7 +130,7 @@ router.post('/', verifyToken, requireEmployee, async (req, res) => {
     });
     if (tableId) await prisma.table.update({ where: { id: tableId }, data: { currentOrderId: order.id } });
     res.status(201).json(order);
-  } catch (e) { console.error(e); res.status(500).json({ error: 'Something went wrong' }); }
+  } catch (e) { console.error(e); res.status(500).json({ error: e.message || 'Something went wrong' }); }
 });
 
 router.get('/:id', verifyToken, requireEmployee, async (req, res) => {
@@ -235,7 +235,7 @@ router.put('/:id/pay', verifyToken, requireEmployee, async (req, res) => {
     res.json(order);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: 'Something went wrong' });
+    res.status(500).json({ error: e.message || 'Something went wrong' });
   }
 });
 
@@ -261,7 +261,7 @@ router.put('/:id/cancel', verifyToken, requireEmployee, async (req, res) => {
     io.to(`kds-room-${req.user.organizationId}`).emit('order-cancelled', { orderId: order.id });
 
     res.json(order);
-  } catch (e) { res.status(500).json({ error: 'Something went wrong' }); }
+  } catch (e) { res.status(500).json({ error: e.message || 'Something went wrong' }); }
 });
 
 router.put('/:id', verifyToken, requireEmployee, async (req, res) => {
@@ -374,7 +374,7 @@ router.put('/:id', verifyToken, requireEmployee, async (req, res) => {
     res.json(order);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: 'Something went wrong' });
+    res.status(500).json({ error: e.message || 'Something went wrong' });
   }
 });
 
