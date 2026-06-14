@@ -1,6 +1,6 @@
 # Cafe POS — Full-Stack Point of Sale System
 
-A production-ready, real-time Point of Sale (POS) system designed for cafes and restaurants. Built with Node.js, Express, Prisma ORM, PostgreSQL, React, Vite, and Socket.IO for live, bidirectional communication across terminals and displays.
+A production-ready, real-time Point of Sale (POS) system designed for cafes and restaurants. Built with Node.js, Express, Prisma ORM, PostgreSQL, React, Vite, and Socket.IO for live, bidirectional communication across all terminals and displays.
 
 **Live Demo:** [odoo-cafe-pos-zeta.vercel.app](https://odoo-cafe-pos-zeta.vercel.app/)  
 **Backend API:** [odoo-cafe-pos-81do.onrender.com](https://odoo-cafe-pos-81do.onrender.com)
@@ -13,19 +13,16 @@ A production-ready, real-time Point of Sale (POS) system designed for cafes and 
 2. [Playful Geometric Design System](#playful-geometric-design-system)
 3. [Mobile & Desktop Responsiveness](#mobile--desktop-responsiveness)
 4. [Screenshots](#screenshots)
-   - [Authentication](#authentication)
-   - [Employee — POS Terminal Flow](#employee--pos-terminal-flow)
-   - [Kitchen Display System](#kitchen-display-system)
-   - [Admin — Backend Panel](#admin--backend-panel)
 5. [Feature Reference](#feature-reference)
 6. [Demo Credentials](#demo-credentials)
 7. [Quick Demo Walkthrough](#quick-demo-walkthrough)
 8. [Tech Stack](#tech-stack)
 9. [Project Structure](#project-structure)
 10. [Local Development Setup](#local-development-setup)
-11. [Production Deployment Guide](#production-deployment-guide)
-12. [Security Architecture](#security-architecture)
-13. [API Endpoints Reference](#api-endpoints-reference)
+11. [Bulk Data Seeding](#bulk-data-seeding)
+12. [Production Deployment Guide](#production-deployment-guide)
+13. [Security Architecture](#security-architecture)
+14. [API Endpoints Reference](#api-endpoints-reference)
 
 ---
 
@@ -106,11 +103,11 @@ The core POS interface. The left side shows a product grid organized by category
 
 ---
 
-**Step 3: POS Terminal — Active Cart**
+**Step 3: POS Terminal — Active Cart (with per-product tax)**
 
 ![POS Terminal - Active Cart](screenshots/05_pos_with_cart.png)
 
-Items are added to the cart by clicking product cards. Quantities can be adjusted inline. The cart automatically evaluates and applies any eligible promotional rules in real time (e.g., 5% discount for orders above a threshold).
+Items are added to the cart by clicking product cards. Quantities can be adjusted inline. Each cart item shows its **individual tax rate inline** (e.g., `· 10% Tax (₹12.00)`). The totals section shows a **separate tax line per rate** (e.g., `Tax (5%)` and `Tax (10%)`) instead of a single blended rate. The cart automatically evaluates and applies any eligible promotional rules in real time.
 
 ---
 
@@ -118,7 +115,7 @@ Items are added to the cart by clicking product cards. Quantities can be adjuste
 
 ![POS Terminal - Coupon Applied](screenshots/06_pos_coupon.png)
 
-The coupon entry field validates codes against the database. When a valid code is entered (e.g., `WELCOME20`), the discount is stacked on top of any auto-applied promotions, and the order summary reflects the updated total.
+The coupon entry field validates codes against the database. When a valid code is entered (e.g., `WELCOME20`), the discount is stacked on top of any auto-applied promotions, and the order summary reflects the updated total. Tax is recalculated proportionally after the discount is applied.
 
 ---
 
@@ -175,7 +172,7 @@ The admin dashboard provides a live summary of today's sales sessions, revenue, 
 
 ![Admin Products](screenshots/12_admin_products.png)
 
-Full CRUD interface for managing menu items. Each product has a name, description, price, category, and availability toggle. Products are searchable and filterable by category. Inline editing supports quick updates.
+Full CRUD interface for managing menu items. Each product has a name, description, price, category, **individual tax rate (%)**, and availability toggle. Products are searchable and filterable by category. Inline editing supports quick updates.
 
 ---
 
@@ -183,7 +180,7 @@ Full CRUD interface for managing menu items. Each product has a name, descriptio
 
 ![Admin Categories](screenshots/13_admin_categories.png)
 
-Category management page for organizing the product menu. Each category has a name, color label (rendered as tabs on the POS terminal), and an active/inactive toggle. Reordering categories changes their display priority on the POS grid.
+Category management page for organizing the product menu. Each category has a name, color label (rendered as tabs on the POS terminal), and an active/inactive toggle.
 
 ---
 
@@ -219,7 +216,7 @@ Both systems stack on top of each other and are configurable with validity windo
 
 ![Admin Users](screenshots/17_admin_users.png)
 
-View and manage all registered accounts. Admins can change user roles (ADMIN / EMPLOYEE), reset passwords, deactivate accounts, and create new users directly from this interface. The table shows each user's role, status, and registration date.
+View and manage all registered accounts. Admins can change user roles (ADMIN / EMPLOYEE), reset passwords, deactivate accounts, and create new users directly from this interface.
 
 ---
 
@@ -240,16 +237,17 @@ The reports module provides:
 ### POS Terminal (Employee Role)
 | Feature | Description |
 |---|---|
-| Floor map & table selection | Live floor plan with real-time occupancy status |
-| Product grid | Color-coded category tabs, search, and quantity controls |
+| Floor map & table selection | Live floor plan with real-time occupancy status across 3 floors (20 tables) |
+| Product grid | Color-coded category tabs (20 categories, 200+ products), search, and quantity controls |
+| Per-product tax display | Each cart item shows its own tax rate inline; totals show a breakdown per rate |
 | Automatic promotions | Rules evaluated in real time based on cart contents |
-| Coupon validation | Code-based discount system with stacking support |
+| Coupon validation | Code-based discount system with stacking support (10 coupons available) |
 | Customer assignment | Link orders to registered customer profiles |
 | Kitchen routing | Socket.IO push to KDS on order confirmation |
 | Cash payment | Tender entry with auto-calculated change |
 | Card payment | Confirmation-based flow |
 | UPI payment | Dynamic QR code generated from configured UPI ID |
-| Receipt options | Print, email, or new order |
+| Receipt options | Print, email (SMTP), or new order |
 
 ### Kitchen Display System (KDS)
 | Feature | Description |
@@ -265,7 +263,7 @@ The reports module provides:
 | Module | Capabilities |
 |---|---|
 | Dashboard | Session stats, revenue charts, category breakdown |
-| Products | Create, edit, delete, toggle availability |
+| Products | Create, edit, delete, toggle availability; set per-product tax rate |
 | Categories | Create, edit, assign color, reorder |
 | Payment Methods | Enable/disable, configure UPI QR |
 | Tables & Floors | Create floors, add tables, manage occupancy |
@@ -281,8 +279,12 @@ The reports module provides:
 | Role | Email | Password | Access |
 |---|---|---|---|
 | Admin | admin@cafe.com | Admin@123 | Full backend + POS terminal |
+| Admin | meetc8030@gmail.com | Meet@8030 | Full backend + POS terminal |
 | Employee | rahul@cafe.com | Rahul@123 | POS terminal only |
 | Employee | priya@cafe.com | Priya@123 | POS terminal only |
+| Employee | amit@cafe.com | Emp@1234 | POS terminal only |
+| Employee | sneha@cafe.com | Emp@1234 | POS terminal only |
+| Employee | rohan@cafe.com | Emp@1234 | POS terminal only |
 
 ---
 
@@ -296,7 +298,7 @@ The reports module provides:
 | Admin Backend Panel | [odoo-cafe-pos-zeta.vercel.app/backend](https://odoo-cafe-pos-zeta.vercel.app/backend) |
 | Backend REST API | [odoo-cafe-pos-81do.onrender.com](https://odoo-cafe-pos-81do.onrender.com) |
 
-> Note: The Render backend is on the free tier. The first request after a period of inactivity may take 30-50 seconds while the instance wakes up. Subsequent requests respond normally.
+> Note: The Render backend is on the free tier. The first request after a period of inactivity may take 30–50 seconds while the instance wakes up. Subsequent requests respond normally.
 
 ---
 
@@ -305,9 +307,9 @@ The reports module provides:
 The following sequence demonstrates the complete order lifecycle from table selection to kitchen completion in under 2 minutes.
 
 1. **Login as Employee**: Go to [odoo-cafe-pos-zeta.vercel.app/login](https://odoo-cafe-pos-zeta.vercel.app/login) and log in with `rahul@cafe.com` / `Rahul@123`. The floor map popup appears automatically.
-2. **Select a Table**: Click on an available table (e.g., T3) to start an order session.
-3. **Build the Order**: Click product cards to add items — Cappuccino, Paneer Pasta, and a dessert. Observe the automatic 5% order promotion applied when the total crosses the threshold.
-4. **Apply a Coupon**: Click the coupon field and enter `WELCOME20`. Click Apply. The 20% discount stacks on top of the auto-promotion.
+2. **Select a Table**: Click on an available table (e.g., G3 on Ground Floor) to start an order session.
+3. **Build the Order**: Click product cards to add items — Cappuccino (5% tax), Paneer Tikka (10% tax), and a Brownie (5% tax). Observe individual tax rates shown inline on each item, and the split tax breakdown in totals.
+4. **Apply a Coupon**: Click the coupon field and enter `WELCOME20`. Click Apply. The 20% discount stacks on top of the auto-promotion. Tax recalculates proportionally.
 5. **Send to Kitchen**: Click the Kitchen button. The order is transmitted instantly.
 6. **Open the KDS**: In a second browser tab, open [odoo-cafe-pos-zeta.vercel.app/kitchen](https://odoo-cafe-pos-zeta.vercel.app/kitchen). The new ticket appears immediately in the "To Cook" column.
 7. **Advance the Ticket**: Click the state button on the ticket to move it to "Preparing".
@@ -324,7 +326,7 @@ The following sequence demonstrates the complete order lifecycle from table sele
 | Real-time transport | Socket.IO | v4 |
 | ORM | Prisma | v5 |
 | Database | PostgreSQL | 14+ |
-| Authentication | JWT (RS256 access + refresh) | — |
+| Authentication | JWT (access + refresh token rotation) | — |
 | Frontend framework | React + Vite | React 18 |
 | Styling | Tailwind CSS | v3 |
 | State management | Zustand | v4 |
@@ -332,6 +334,7 @@ The following sequence demonstrates the complete order lifecycle from table sele
 | QR code generation | qrcode.react | v3 |
 | HTTP client | Axios | v1 |
 | Notifications | react-hot-toast | v2 |
+| Email | Nodemailer (SMTP) | v6 |
 
 ---
 
@@ -342,7 +345,8 @@ cafe-pos/
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma          # Data model: User, Product, Category, Order, Table, Coupon, Promotion
-│   │   └── seed.js                # Seeds admin account, demo products, categories, tables, and coupons
+│   │   ├── seed.js                # Seeds admin, demo products, categories, tables, coupons, orders
+│   │   └── migrations/            # Prisma migration history
 │   ├── src/
 │   │   ├── middleware/
 │   │   │   ├── auth.js            # JWT verification, role guards (ADMIN / EMPLOYEE)
@@ -350,10 +354,10 @@ cafe-pos/
 │   │   ├── routes/
 │   │   │   ├── auth.js            # POST /login, /logout, /refresh
 │   │   │   ├── users.js           # CRUD for user accounts
-│   │   │   ├── products.js        # CRUD for menu items
+│   │   │   ├── products.js        # CRUD for menu items (includes tax field)
 │   │   │   ├── categories.js      # CRUD for product categories
 │   │   │   ├── tables.js          # Floor and table management
-│   │   │   ├── orders.js          # Order creation, status transitions
+│   │   │   ├── orders.js          # Order creation, per-product tax calc, status transitions
 │   │   │   ├── coupons.js         # Coupon creation and validation
 │   │   │   ├── promotions.js      # Conditional promotion rules
 │   │   │   ├── paymentMethods.js  # Payment option configuration
@@ -363,7 +367,11 @@ cafe-pos/
 │   │   │   ├── sessions.js        # POS session lifecycle
 │   │   │   └── kitchen.js         # KDS status transitions
 │   │   └── utils/
-│   │       └── promotionEngine.js # Evaluates cart against active promotion rules
+│   │       ├── promotionEngine.js # Evaluates cart against active promotion rules
+│   │       └── emailService.js    # SMTP receipt emails with dynamic tax breakdown
+│   ├── bulk_seed.js               # Bulk seeder: 20 categories, 100 products, 10 coupons, 20 tables, 25 orders
+│   ├── bulk_seed_products2.js     # Batch 2 seeder: 100 more products across all categories
+│   ├── demo_reset.js              # Resets runtime data for demo/hackathon presentations
 │   ├── server.js                  # Express app, Socket.IO setup, route mounting
 │   └── render.yaml                # Render.com deployment configuration
 │
@@ -374,18 +382,13 @@ cafe-pos/
     │   ├── components/
     │   │   ├── layout/
     │   │   │   └── BackendLayout.jsx  # Admin sidebar, navigation, logout
-    │   │   ├── pos/
-    │   │   │   ├── ProductGrid.jsx
-    │   │   │   ├── CartPanel.jsx
-    │   │   │   ├── FloorPopup.jsx
-    │   │   │   ├── CheckoutModal.jsx
-    │   │   │   └── ReceiptModal.jsx
-    │   │   └── ui/               # Shared UI primitives (Badge, Modal, Spinner)
+    │   │   └── ui/                # Shared UI primitives (Badge, Modal, Spinner)
     │   ├── pages/
     │   │   ├── Login.jsx
     │   │   ├── Signup.jsx
     │   │   ├── pos/
-    │   │   │   └── PosTerminal.jsx
+    │   │   │   ├── OrderView.jsx  # Main POS terminal: cart, tax breakdown, payment, receipt
+    │   │   │   └── OrdersList.jsx # Order history with dynamic per-rate tax display
     │   │   ├── kitchen/
     │   │   │   └── KitchenDisplay.jsx
     │   │   └── backend/
@@ -431,13 +434,7 @@ cd backend
 npm install
 ```
 
-Copy and configure environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your values:
+Create and configure environment variables:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/cafe_pos"
@@ -446,6 +443,8 @@ JWT_REFRESH_SECRET="your-32-char-refresh-secret"
 FRONTEND_URL="http://localhost:5173"
 NODE_ENV="development"
 PORT=5000
+EMAIL_USER="your-gmail@gmail.com"    # Optional — for email receipts
+EMAIL_PASS="your-app-password"        # Optional — Gmail App Password
 ```
 
 Run database migrations and seed default data:
@@ -473,10 +472,9 @@ cd frontend
 npm install
 ```
 
-Create a frontend environment file:
+Create a frontend environment file (`.env.local`):
 
-```bash
-# Create .env.local
+```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
@@ -500,13 +498,71 @@ npm run dev
 
 ---
 
+## Bulk Data Seeding
+
+Two bulk seed scripts are included for populating both local and deployed databases with realistic demo data.
+
+### What gets seeded
+
+| Script | Data Added |
+|---|---|
+| `bulk_seed.js` | 2 admin accounts, 5 employees, 20 categories, 100 products, 10 coupons, 20 tables (3 floors), 25 orders |
+| `bulk_seed_products2.js` | 100 additional products across all existing categories (Batch 2) |
+
+### Run on local database
+
+```bash
+cd backend
+node bulk_seed.js
+node bulk_seed_products2.js
+```
+
+### Run on deployed (production) database
+
+```bash
+cd backend
+DATABASE_URL="your-external-postgres-url" node bulk_seed.js
+DATABASE_URL="your-external-postgres-url" node bulk_seed_products2.js
+```
+
+> Both scripts are **idempotent** — safe to run multiple times without creating duplicates.
+
+### Seeded accounts
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@cafe.com | Admin@123 |
+| Admin | meetc8030@gmail.com | Meet@8030 |
+| Employee | rahul@cafe.com | Rahul@123 |
+| Employee | priya@cafe.com | Priya@123 |
+| Employee | amit@cafe.com | Emp@1234 |
+| Employee | sneha@cafe.com | Emp@1234 |
+| Employee | rohan@cafe.com | Emp@1234 |
+
+### Seeded coupons
+
+| Code | Type | Value |
+|---|---|---|
+| WELCOME20 | Percentage | 20% off |
+| SAVE50 | Fixed | ₹50 off |
+| FLAT10 | Percentage | 10% off |
+| SAVE10 | Percentage | 10% off |
+| MEET20 | Percentage | 20% off |
+| HAPPY15 | Percentage | 15% off |
+| FLAT100 | Fixed | ₹100 off |
+| NEWUSER25 | Percentage | 25% off |
+| VIP30 | Percentage | 30% off |
+| WEEKEND5 | Percentage | 5% off |
+
+---
+
 ## Production Deployment Guide
 
-### Step 1 — Database (Render PostgreSQL)
+### Step 1 — Database (Render PostgreSQL or Supabase)
 
-1. Log in to [render.com](https://render.com) and click **New > PostgreSQL**.
-2. Name your database (e.g., `cafe-pos-db`), select your preferred region, and choose the database package.
-3. Once created, copy the **Internal Database URL** (to connect from services on Render) and the **External Database URL** (for local/CLI administration).
+1. Create a PostgreSQL database on [render.com](https://render.com) or [supabase.com](https://supabase.com).
+2. Copy the **External Database URL** for running seed scripts locally.
+3. Copy the **Internal Database URL** (for Render) or the **pooler connection string** (for Supabase) for the backend service.
 
 ---
 
@@ -515,20 +571,23 @@ npm run dev
 1. Push the repository to GitHub.
 2. Go to [render.com](https://render.com) and create a **New Web Service**.
 3. Connect the GitHub repo. Set the **Root Directory** to `cafe-pos/backend`.
-4. Render detects `render.yaml` automatically. Confirm the build command (`npm install`) and start command (`node server.js`).
+4. Render detects `render.yaml` automatically. Build command: `npm install && npx prisma generate && npx prisma migrate deploy`. Start command: `node server.js`.
 5. Add the following **Environment Variables** in the Render dashboard:
 
    | Variable | Value |
    |---|---|
-   | `DATABASE_URL` | Render Internal Database URL |
+   | `DATABASE_URL` | Internal Database URL |
    | `JWT_SECRET` | Random 32+ character string |
    | `JWT_REFRESH_SECRET` | Random 32+ character string |
    | `FRONTEND_URL` | Vercel deployment URL (add after Step 3) |
    | `NODE_ENV` | `production` |
+   | `EMAIL_USER` | Gmail address (optional) |
+   | `EMAIL_PASS` | Gmail App Password (optional) |
 
-6. After the first successful deploy, run the seed script using the Render Shell:
+6. After the first successful deploy, seed the database:
    ```bash
-   node prisma/seed.js
+   DATABASE_URL="your-external-db-url" node bulk_seed.js
+   DATABASE_URL="your-external-db-url" node bulk_seed_products2.js
    ```
 
 ---
@@ -571,18 +630,18 @@ npm run dev
 ### Products
 | Method | Endpoint | Role | Description |
 |---|---|---|---|
-| GET | `/api/products` | Any | List all products |
-| POST | `/api/products` | Admin | Create a product |
+| GET | `/api/products` | Any | List all active products (includes tax field) |
+| POST | `/api/products` | Admin | Create a product with name, price, category, tax rate |
 | PUT | `/api/products/:id` | Admin | Update a product |
 | DELETE | `/api/products/:id` | Admin | Delete a product |
 
 ### Orders & Sessions
 | Method | Endpoint | Role | Description |
 |---|---|---|---|
-| POST | `/api/orders` | Employee | Create a new order |
+| POST | `/api/orders` | Employee | Create a new order (tax calculated per product) |
 | GET | `/api/orders/kitchen` | Any | Get active kitchen orders |
 | PUT | `/api/orders/:id/status` | Any | Update order status (triggers Socket.IO) |
-| POST | `/api/sessions` | Employee | Open a POS session for a table |
+| POST | `/api/sessions` | Employee | Open a POS session |
 | PUT | `/api/sessions/:id/close` | Employee | Close session after payment |
 
 ### Reports
@@ -596,4 +655,17 @@ npm run dev
 
 ---
 
-*Cafe POS v1.0 — Built with Node.js, Prisma, React, and Socket.IO*
+## Changelog
+
+### Latest Updates
+
+- **Per-product tax calculation**: Tax is now applied individually per product at its own rate (e.g., 5% on beverages, 10% on food). The bill totals show a separate line for each tax rate. Discounts and coupons scale the tax proportionally.
+- **Email receipts**: Dynamic tax breakdown in SMTP email receipts — one row per tax rate instead of a hardcoded flat rate.
+- **Bulk seeding**: Added `bulk_seed.js` and `bulk_seed_products2.js` to populate databases with 200+ products, 20 categories, 10 coupons, 20 tables across 3 floors, 25 orders, and 7 user accounts.
+- **Extended product catalog**: 200+ menu items across 20 categories (Hot Drinks, Cold Drinks, Burgers, Pizza, Pasta, Rice Bowls, Salads, Soups, Desserts, and more).
+- **Multi-floor layout**: 3 floors (Ground, First, Rooftop) with 20 tables total.
+- **Additional admin**: `meetc8030@gmail.com` added as a second admin account.
+
+---
+
+*Cafe POS v2.0 — Built with Node.js, Prisma, React, and Socket.IO*
