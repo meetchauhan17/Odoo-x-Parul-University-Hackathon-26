@@ -1,15 +1,34 @@
 const jwt = require('jsonwebtoken');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   // Accept Bearer header OR ?token= query param (for file download links)
   const raw = req.headers.authorization?.startsWith('Bearer ')
     ? req.headers.authorization.split(' ')[1]
     : req.query.token;
   if (!raw) return res.status(401).json({ error: 'No token' });
   try {
-    req.user = jwt.verify(raw, process.env.JWT_SECRET);
+    const decoded = jwt.verify(raw, process.env.JWT_SECRET);
+    req.user = decoded;
+
+    // Fallback for active sessions logged in before migration
+    if (!req.user.organizationId) {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: { organizationId: true }
+      });
+      if (dbUser) {
+        req.user.organizationId = dbUser.organizationId;
+      } else {
+        return res.status(401).json({ error: 'Organization not found for user' });
+      }
+    }
+
     next();
-  } catch { return res.status(401).json({ error: 'Invalid or expired token' }); }
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 };
 
 const requireAdmin = (req, res, next) => {
